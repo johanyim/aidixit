@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Broadcasting with Socket.IO</title>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+  <script>
+    const socket = io('http://localhost:3000');
+
+    socket.on('images', (imageURLs) => {
+        // Check if imageURLs is an array
+        if (Array.isArray(imageURLs)) {
+            // Loop through the array of image URLs
+            imageURLs.forEach((imageURL) => {
+                // Create an image element for each URL and append it to the body
+                const img = document.createElement('img');
+                img.src = imageURL;
+                document.body.appendChild(img);
+            });
+        } else {
+            console.error('Received data is not an array:', imageURLs);
+        }
+    });
+
+  </script>
+</body>
+</html>
