@@ -49,5 +49,14 @@ app.use(express.static(path.join(__dirname, "public")))
 
 // send images buffer
 io.on('connection', (socket) => {
-    socket.emit('images',['https://source.unsplash.com/random', 'https://source.unsplash.com/random?blue sky', 'https://source.unsplash.com/random?grass'])
+    socket.emit('images',
+        [
+            'https://source.unsplash.com/random?night', 
+            'https://source.unsplash.com/random?sky', 
+            'https://source.unsplash.com/random?grass',
+            'https://source.unsplash.com/random?city',
+            'https://source.unsplash.com/random?food',
+            'https://source.unsplash.com/random?animal',
+        ]
+    )
 });

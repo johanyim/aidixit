@@ -1,0 +1,47 @@
+/* idk */
+
+.game {
+
+    display: flex;
+    flex-direction: column-reverse;
+
+
+}
+
+.user-area {
+    align-self: flex-end;
+
+    position: fixed;
+    bottom:0px;
+    width: 100%;
+    margin: 0; padding: 0;
+}
+
+#cards {
+    flex: 0 0 auto;
+    display: flex;
+    max-width: 95vw;
+    justify-content: space-between;
+    margin: 0 10vh;
+}
+
+
+.card:hover {
+    transform:  scale(2,2) translateY(-7rem);
+}
+.card:first-child {
+    margin-left:0;
+}
+
+.card {
+    transition: all 0.3s ease-out;
+    flex: 0;
+    aspect-ratio: 0.66;
+    height: 30vh;
+    object-fit: cover;
+    border: 5px solid grey;
+    border-radius: 5px;
+    margin-left: -20vh;
+}
+
+
