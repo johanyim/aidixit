@@ -49,6 +49,7 @@ app.use(express.static(path.join(__dirname, "public")))
 
 // send images buffer
 io.on('connection', (socket) => {
+    // add id
     socket.emit('images',
         [
             'https://source.unsplash.com/random?night', 
@@ -59,4 +60,41 @@ io.on('connection', (socket) => {
             'https://source.unsplash.com/random?animal',
         ]
     )
+
+    // Game
+    // socket.on('submitCard', (cardInfo) => {
+    //     // Handle a player submitting a card
+    //     // Emit 'updateGameState' to broadcast the updated game state
+    //     io.emit('updateGameState', updatedGameState);
+    // });
+
+    // socket.on('vote', (voteInfo) => {
+    //     // Handle a player voting
+    //     // Emit 'updateGameState' to broadcast the updated game state
+    //     io.emit('updateGameState', updatedGameState);
+    // });
+
+    // socket.on('revealCard', () => {
+    //     // Handle revealing chosen cards
+    //     // Emit 'updateGameState' to broadcast the updated game state
+    //     io.emit('updateGameState', updatedGameState);
+    // });
+
+    // Chat events
+    // Handle sending a chat message
+    socket.on('sendMessage', (messageInfo) => {
+        // TODO: include/ append player at front?
+        io.emit('broadcastMessage', messageInfo);
+    });
 });
+
+
+// const gameState = {
+//     players: [
+//         { id: 'player1', name: 'Player 1', score: 0, submittedCard: null },
+//         // ... other player details
+//     ],
+//     currentPhase: 'cardSubmission', // Possible phases: 'cardSubmission', 'voting', 'scoring', etc.
+//     gameMaster: 'player2', // ID of the current game master
+//     // ... other game state details
+// };

@@ -17,3 +17,33 @@ socket.on('images', (imageURLs) => {
         console.error('Received data is not an array:', imageURLs);
     }
 });
+
+//------------------------- CHAT
+// Listen for 'chatMessage' events from the server
+socket.on('broadcastMessage', (message) => {
+    displayMessage(message);
+});
+
+
+function displayMessage(message) {
+    // const messageElement = document.createElement('div');
+    const messageElement = document.createElement('li');
+    messageElement.textContent = message;
+
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.appendChild(messageElement);
+
+    // Scroll to the bottom of the chat container to show the latest messages
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function sendMessage() {
+    const messageInput = document.getElementById('message-input');
+    const message = messageInput.value;
+
+    if (message.trim() !== '') {
+        // Emit the 'chatMessage' event to the server
+        socket.emit('sendMessage', message);
+        messageInput.value = '';
+    }
+}

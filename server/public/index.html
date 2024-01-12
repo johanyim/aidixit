@@ -17,12 +17,16 @@
 
         <div class="user-area">
             <ul id="cards"></ul>
-            <ul class="messages">
-            </ul>
-            <form>
-                <input type="text" placeholder="Your message">
-                <button>Send</button>
-            </form>
+
+            <div id="chat-container">
+                <!-- <div id="chat-messages"></div> -->
+                <ul class="messages" id="chat-messages">
+                </ul>
+                <input type="text" placeholder="Your message" id="message-input">
+                <button onclick="sendMessage()">Send</button>
+
+            </div>
+
         </div>
     </div>
 
