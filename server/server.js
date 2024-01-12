@@ -4,7 +4,7 @@
 // const socketIO = require('socket.io');
 // const path = require('path');
 
-import express from "express" 
+import express from "express"
 import { Server } from "socket.io"
 import path from "path"
 import { v4 as uuidv4 } from 'uuid';
@@ -26,47 +26,88 @@ const expressServer = app.listen(PORT, () => {
 const io = new Server(expressServer, {
     //cross origin resource request
     cors: {
-        origin: process.env.NODE_ENV === "production" ? false : 
-        [
-            "http://localhost:8080", 
-            "http://127.0.0.1:8080",
-            "http://localhost:3000", 
-            "http://127.0.0.1:3000",
-        ]
+        origin: process.env.NODE_ENV === "production" ? false :
+            [
+                "http://localhost:8080",
+                "http://127.0.0.1:8080",
+                "http://localhost:3000",
+                "http://127.0.0.1:3000",
+            ]
     }
 })
 
-// // we can use express static paths 
-//
-// app.get('/', (req, res) => {
-//     const filePath = path.join(__dirname, '../index.html');
-//     res.sendFile(filePath);
-// });
 
 // static path
 app.use(express.static(path.join(__dirname, "public")))
 
 
+// ------------------------------------------------------ GAME (maybe a new folder, but I forgot how to link it)
+const gameState = {
+    players: [
+        // { id: 'player1', name: 'Player 1', score: 0, submittedCard: null },
+        // ... other player details
+    ],
+    currentPhase: 'preparation', // Possible phases: 'preparation', 'cardSubmission', 'voting', 'scoring', etc.
+    gameMaster: '', // ID of the current game master
+    prompt: '',
+};
+
+// const card = {
+//     owner: '', //playerId
+//     imageUrl: '' //url_to_card_image
+// };
+
+const cards = {}
+const initialCardNumber = 6
+
 // send images buffer
 io.on('connection', (socket) => {
-    // add id
-    socket.emit('initialCards',
-        [
-           {'id':uuidv4(), 'URL': 'https://source.unsplash.com/random?night' } , 
-           {'id':uuidv4(), 'URL': 'https://source.unsplash.com/random?sky' } , 
-           {'id':uuidv4(), 'URL': 'https://source.unsplash.com/random?grass' } , 
-           {'id':uuidv4(), 'URL': 'https://source.unsplash.com/random?city' } , 
-           {'id':uuidv4(), 'URL': 'https://source.unsplash.com/random?food' } , 
-           {'id':uuidv4(), 'URL': 'https://source.unsplash.com/random?animal' } , 
-        ]
-    )
+    // Create a new player and add them to the players array
+    handleNewPlayerEnter(socket)
 
-    // Game
-    // socket.on('submitCard', (cardInfo) => {
-    //     // Handle a player submitting a card
-    //     // Emit 'updateGameState' to broadcast the updated game state
-    //     io.emit('updateGameState', updatedGameState);
-    // });
+
+    // start Game
+    socket.on('startGame', () => {
+        if (gameState.players.length > 0) {
+            gameState.currentPhase = 'cardSubmission'
+            // Randomly select a game master
+            gameState.gameMaster = Math.floor(Math.random() * gameState.players.length)
+            io.emit('updateGameState', gameState);
+
+        } else {
+            // Handle the case where there are no players, perhaps emit an error event
+            console.log("Cannot start the game without players.");
+            // You might want to emit an error event to inform clients or take appropriate action
+            io.emit('gameError', 'Cannot start the game without players.');
+        }
+    });
+
+
+    // cardInfo = { 'id': string, 'URL': string }
+    socket.on('submitCard', (cardInfo) => {
+        // Handle a player submitting a card
+        const player = gameState.players.find(player => player.id === socket.id);
+
+        if (player) {
+            player.submittedCard = cardInfo;
+        }
+
+        // Remove from its card deck, thinking whether to store card deck
+        // const playerDeck = gameState.playerDecks[socket.id];
+        // const submittedCardIndex = playerDeck.findIndex(card => card.id === cardInfo.id);
+
+        // if (submittedCardIndex !== -1) {
+        //     playerDeck.splice(submittedCardIndex, 1);
+        // }
+
+        // Check if all players have submitted cards
+        const allPlayersSubmitted = gameState.players.every(player => player.submittedCard !== null);
+
+        if (allPlayersSubmitted) {
+            gameState.currentPhase = 'voting';
+            io.emit('updateGameState', gameState);
+        }
+    });
 
     // socket.on('vote', (voteInfo) => {
     //     // Handle a player voting
@@ -88,13 +129,37 @@ io.on('connection', (socket) => {
     });
 });
 
+function generateCard(playerId) {
+    const cardId = uuidv4()
+    const searchTerms = ['night', 'sky', 'grass', 'city', 'food', 'animal', 'sea', "nature", "cityscape", "technology", "anime", "programming", "travel", "architecture", "wildlife", "abstract", "vintage", "food", "portrait", "landscape", "ocean", "music", "sports", "night", "skyline", "artistic", "animals", "fashion", "science", "books", "fitness", "cars", "coffee", "space", "movies", "gaming", "holiday", "business", "street", "sunrise", "sunset", "beach", "mountains", "forest", "flowers", "rain", "snow", "urban", "colorful", "minimal", "texture", "water", "technology", "office", "people"];
+    const imageUrl = 'https://source.unsplash.com/random?' + Math.floor(Math.random() * searchTerms.length)
 
-// const gameState = {
-//     players: [
-//         { id: 'player1', name: 'Player 1', score: 0, submittedCard: null },
-//         // ... other player details
-//     ],
-//     currentPhase: 'cardSubmission', // Possible phases: 'cardSubmission', 'voting', 'scoring', etc.
-//     gameMaster: 'player2', // ID of the current game master
-//     // ... other game state details
-// };
+    const card = {
+        imageUrl: imageUrl,
+        owner: playerId
+    }
+    cards[cardId] = card
+
+    return cardId
+}
+
+function handleNewPlayerEnter(socket) {
+    const newPlayer = {
+        'id': socket.id,
+        'score': 0,
+    };
+
+    gameState.players.push(newPlayer);
+
+    //Setup initial card deck
+    const cardDeck = []
+
+    for (let i = 0; i < initialCardNumber; i++) {
+        const cardId = generateCard(socket.id)
+        const cardInfo = { 'id': cardId, 'URL': cards[cardId].imageUrl }
+        cardDeck.push(cardInfo)
+    }
+
+    socket.emit('initialCards', cardDeck)
+}
+
