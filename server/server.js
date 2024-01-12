@@ -43,7 +43,7 @@ app.use(express.static(path.join(__dirname, "public")))
 
 // ------------------------------------------------------ GAME (maybe a new folder, but I forgot how to link it)
 const phases = ['preparation', 'gameMasterSubmit', 'cardSubmission', 'voting', 'scoring']
-const currentPhaseId = 0
+let currentPhaseId = 0
 const gameState = {
     players: [
         // { id: 'player1', name: 'Player 1', score: 0, submittedCard: null },
