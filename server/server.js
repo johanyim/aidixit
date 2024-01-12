@@ -94,9 +94,9 @@ io.on('connection', (socket) => {
             player.submittedCard = true;
 
             if (Array.isArray(cardInfo)){
-                chosenCards = [...chosenCards, ...cardInfo]
+                gameState.chosenCards = [...gameState.chosenCards, ...cardInfo]
             } else {
-                chosenCards = [...chosenCards, cardInfo]
+                gameState.chosenCards = [...gameState.chosenCards, cardInfo]
             }
             io.emit('updateGameState', gameState);
 
@@ -117,9 +117,9 @@ io.on('connection', (socket) => {
             player.submittedCard = true;
 
             if (Array.isArray(cardInfo)){
-                chosenCards = [...chosenCards, ...cardInfo]
+                gameState.chosenCards = [...gameState.chosenCards, ...cardInfo]
             } else {
-                chosenCards = [...chosenCards, cardInfo]
+                gameState.chosenCards = [...gameState.chosenCards, cardInfo]
             }
         }
 
@@ -191,7 +191,7 @@ function handleNewPlayerEnter(socket) {
         cardDeck.push(cardInfo)
     }
 
-    socket.emit('initialCards', cardDeck)
+    io.emit('initialCards', cardDeck)
 }
 
 
