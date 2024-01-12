@@ -26,31 +26,29 @@ socket.on('initialCards', (cards) => {
 });
 
 //------------------------- CHAT
-// Listen for 'chatMessage' events from the server
-socket.on('broadcastMessage', (message) => {
-    displayMessage(message);
-});
 
 
-function displayMessage(message) {
-    // const messageElement = document.createElement('div');
-    const messageElement = document.createElement('li');
-    messageElement.textContent = message;
+document.getElementById('message-form')
+    .addEventListener('submit', sendMessage)
 
-    const chatMessages = document.getElementById('chat-messages');
-    chatMessages.appendChild(messageElement);
-
-    // Scroll to the bottom of the chat container to show the latest messages
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function sendMessage() {
-    const messageInput = document.getElementById('message-input');
-    const message = messageInput.value;
-
-    if (message.trim() !== '') {
+function sendMessage(e) {
+    e.preventDefault();
+    const input = document.getElementById('message-input');
+    if (input.value) {
         // Emit the 'chatMessage' event to the server
-        socket.emit('sendMessage', message);
-        messageInput.value = '';
+        socket.emit('sendMessage', input.value);
+        input.value = '';
     }
+
+    input.focus()
 }
+
+
+
+
+socket.on('broadcastMessage', (data) => {
+    const li = document.createElement('li')
+    li.textContent = data
+    document.getElementById('chat-messages')
+        .appendChild(li)
+})
