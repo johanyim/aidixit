@@ -1,16 +1,23 @@
 
 const socket = io('http://localhost:3000');
 
-socket.on('images', (imageURLs) => {
+
+
+// interface card
+// id:string
+// URL: string 
+
+socket.on('initialCards', (cards) => {
     // Check if imageURLs is an array
-    if (Array.isArray(imageURLs)) {
+    if (Array.isArray(cards)) {
         // Loop through the array of image URLs
         const cardsList = document.getElementById('cards')
-        imageURLs.forEach((imageURL) => {
+        cards.forEach((card) => {
             // Create an image element for each URL and append it to the body
+            const URL = card.URL
             const img = document.createElement('img');
             img.classList.add("card")
-            img.src = imageURL;
+            img.src = URL;
             cardsList.appendChild(img);
         });
     } else {

@@ -7,7 +7,7 @@
 import express from "express" 
 import { Server } from "socket.io"
 import path from "path"
-
+import { v4 as uuidv4 } from 'uuid';
 // extra code to enable __dirname = "./"
 import { fileURLToPath } from "url"
 const __filename = fileURLToPath(import.meta.url)
@@ -50,14 +50,14 @@ app.use(express.static(path.join(__dirname, "public")))
 // send images buffer
 io.on('connection', (socket) => {
     // add id
-    socket.emit('images',
+    socket.emit('initialCards',
         [
-            'https://source.unsplash.com/random?night', 
-            'https://source.unsplash.com/random?sky', 
-            'https://source.unsplash.com/random?grass',
-            'https://source.unsplash.com/random?city',
-            'https://source.unsplash.com/random?food',
-            'https://source.unsplash.com/random?animal',
+           {'id':uuidv4(), 'URL': 'https://source.unsplash.com/random?night' } , 
+           {'id':uuidv4(), 'URL': 'https://source.unsplash.com/random?sky' } , 
+           {'id':uuidv4(), 'URL': 'https://source.unsplash.com/random?grass' } , 
+           {'id':uuidv4(), 'URL': 'https://source.unsplash.com/random?city' } , 
+           {'id':uuidv4(), 'URL': 'https://source.unsplash.com/random?food' } , 
+           {'id':uuidv4(), 'URL': 'https://source.unsplash.com/random?animal' } , 
         ]
     )
 
