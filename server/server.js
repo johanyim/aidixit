@@ -42,13 +42,16 @@ app.use(express.static(path.join(__dirname, "public")))
 
 
 // ------------------------------------------------------ GAME (maybe a new folder, but I forgot how to link it)
+const phases = ['preparation', 'gameMasterSubmit', 'cardSubmission', 'voting', 'scoring']
+const currentPhaseId = 0
 const gameState = {
     players: [
         // { id: 'player1', name: 'Player 1', score: 0, submittedCard: null },
         // ... other player details
     ],
-    currentPhase: 'preparation', // Possible phases: 'preparation', 'cardSubmission', 'voting', 'scoring', etc.
+    currentPhase: phases[currentPhaseId], // phases[0]
     gameMaster: '', // ID of the current game master
+    chosenCards: [],
     prompt: '',
 };
 
@@ -65,11 +68,10 @@ io.on('connection', (socket) => {
     // Create a new player and add them to the players array
     handleNewPlayerEnter(socket)
 
-
     // start Game
     socket.on('startGame', () => {
         if (gameState.players.length > 0) {
-            gameState.currentPhase = 'cardSubmission'
+            updatePhase()
             // Randomly select a game master
             gameState.gameMaster = Math.floor(Math.random() * gameState.players.length)
             io.emit('updateGameState', gameState);
@@ -82,6 +84,29 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('gameMasterSubmitCard', ({prompt, cardInfo}) => {
+        // When game master submits
+        updatePhase()
+        gameState.prompt = prompt
+        const player = gameState.players.find(player => player.id === socket.id);
+
+        if (player.id === gameState.gameMaster) {
+            player.submittedCard = true;
+
+            if (Array.isArray(cardInfo)){
+                chosenCards = [...chosenCards, ...cardInfo]
+            } else {
+                chosenCards = [...chosenCards, cardInfo]
+            }
+            io.emit('updateGameState', gameState);
+
+        } else {
+            // Handle the case where there are no players, perhaps emit an error event
+            console.log("Submited by not gameMaster.");
+            // You might want to emit an error event to inform clients or take appropriate action
+            io.emit('gameMasterPhaseError', '"Submited by not gameMaster.');
+        }
+    });
 
     // cardInfo = { 'id': string, 'URL': string }
     socket.on('submitCard', (cardInfo) => {
@@ -89,7 +114,13 @@ io.on('connection', (socket) => {
         const player = gameState.players.find(player => player.id === socket.id);
 
         if (player) {
-            player.submittedCard = cardInfo;
+            player.submittedCard = true;
+
+            if (Array.isArray(cardInfo)){
+                chosenCards = [...chosenCards, ...cardInfo]
+            } else {
+                chosenCards = [...chosenCards, cardInfo]
+            }
         }
 
         // Remove from its card deck, thinking whether to store card deck
@@ -101,10 +132,10 @@ io.on('connection', (socket) => {
         // }
 
         // Check if all players have submitted cards
-        const allPlayersSubmitted = gameState.players.every(player => player.submittedCard !== null);
+        const allPlayersSubmitted = gameState.players.every(player => player.submittedCard);
 
         if (allPlayersSubmitted) {
-            gameState.currentPhase = 'voting';
+            updatePhase();
             io.emit('updateGameState', gameState);
         }
     });
@@ -163,3 +194,8 @@ function handleNewPlayerEnter(socket) {
     socket.emit('initialCards', cardDeck)
 }
 
+
+function updatePhase(){
+    currentPhaseId+=1
+    gameState.currentPhase = phases[currentPhaseId]
+}
