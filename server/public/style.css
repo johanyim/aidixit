@@ -11,8 +11,19 @@
     position: fixed;
     bottom:0px;
     width: 100%;
-    margin: 0; padding: 0;
+
+    /* background: blue; */
+    padding: 40px;
+    
 }
+
+
+.message-container {
+    /* background: red; */
+    height: 400px;
+
+}
+
 
 #cards {
     align-self: center;
