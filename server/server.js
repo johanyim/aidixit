@@ -67,11 +67,12 @@ io.on('connection', (socket) => {
     //     io.emit('updateGameState', updatedGameState);
     // });
 
+
+
     // Chat events
     // Handle sending a chat message
     socket.on('sendMessage', (messageInfo) => {
-        // TODO: include/ append player at front?
-        io.emit('broadcastMessage', messageInfo);
+        io.emit('broadcastMessage', `${socket.id.substring(0,5)}: ${messageInfo}`) //from socket.send
     });
 });
 

@@ -75,7 +75,7 @@ function handleNewPlayerEnter(socket) {
         const cardInfo = { 'id': cardId, 'URL': cards[cardId].imageUrl }
         cardDeck.push(cardInfo)
     }
-
+    
     io.emit('initialCards', cardDeck)
 }
 
