@@ -41,7 +41,7 @@ io.on('connection', (socket) => {
     // Create a new player and add them to the players array
     handleNewPlayerEnter(socket)
 
-    // start Game
+    // start Game, 
     socket.on('startGame', () => {
         handleGameStart(socket)
     });

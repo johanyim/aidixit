@@ -79,7 +79,7 @@ function handleNewPlayerEnter(socket) {
     io.emit('initialCards', cardDeck)
 }
 
-// start Game
+// start Game, get game master
 function handleGameStart() {
     if (gameState.players.length > 0) {
         updatePhase()
@@ -100,8 +100,8 @@ function handleGameStart() {
 //     cardInfo: SentCardInfo ;
 // } 
 
+// Game master submit card and prompt
 function handleGameMasterSubmitCard(socket, { prompt, cardId }) {
-    // When game master submits
     updatePhase()
     gameState.prompt = prompt
     const player = gameState.players.find(player => player.id === socket.id);
@@ -124,9 +124,8 @@ function handleGameMasterSubmitCard(socket, { prompt, cardId }) {
     }
 }
 
-// cardInfo = { 'id': string, 'URL': string }
+// Other player submit cards
 function handleSubmitCard(socket, cardId) {
-    // Handle a player submitting a card
     const player = gameState.players.find(player => player.id === socket.id);
 
     if (player) {
