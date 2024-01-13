@@ -1,6 +1,5 @@
 // socketSetup.js
 
-const socketIO = require('socket.io');
 import { Server } from "socket.io"
 
 let io; // This will store the Socket.IO instance
