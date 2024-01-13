@@ -6,7 +6,6 @@
 
 .user-area {
     align-self: flex-end;
-
     position: fixed;
     bottom: 0px;
 
@@ -14,7 +13,6 @@
     padding: 40px;
     
 }
-
 
 .message-container {
     /* background: red; */
@@ -27,6 +25,14 @@
     list-style: none;
 
 }
+
+.info {
+    color: grey;
+}
+.chat {
+    color: grey;
+}
+
 
 
 

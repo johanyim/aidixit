@@ -59,6 +59,9 @@ const cards = {}
 const initialCardNumber = 6
 
 function handleNewPlayerEnter(socket) {
+    //chat enter message
+    socket.broadcast.emit('infoMessage', `${socket.id.substring(0,5)} has entered`) //from socket.send
+
     const newPlayer = {
         ...defaultPlayer,
         'id': socket.id,

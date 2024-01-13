@@ -39,17 +39,20 @@ const io = initializeSocket(expressServer)
 // send images buffer
 io.on('connection', (socket) => {
     // Create a new player and add them to the players array
+    // also broadcasts a grey info message
     handleNewPlayerEnter(socket)
 
     // start Game, 
     socket.on('startGame', () => {
         handleGameStart(socket)
     });
-
+    
+    // storyteller card chosen
     socket.on('gameMasterSubmitCard', ({prompt, cardInfo}) => {
         handleGameMasterSubmitCard(socket, {prompt, cardInfo})
     });
 
+    // guesser card chosen
     // cardInfo = { 'id': string, 'URL': string }
     socket.on('submitCard', (cardInfo) => {
         handleSubmitCard(socket, cardInfo)
@@ -74,6 +77,8 @@ io.on('connection', (socket) => {
     socket.on('sendMessage', (messageInfo) => {
         io.emit('broadcastMessage', `${socket.id.substring(0,5)}: ${messageInfo}`) //from socket.send
     });
+
+
 });
 
 export { io };

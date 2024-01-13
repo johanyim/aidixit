@@ -47,6 +47,15 @@ function sendMessage(e) {
 socket.on('broadcastMessage', (data) => {
     const li = document.createElement('li')
     li.textContent = data
+    li.classList.add('chat')
+    document.getElementById('chat-messages')
+        .appendChild(li)
+})
+
+socket.on('infoMessage', (data) => {
+    const li = document.createElement('li')
+    li.textContent = data
+    li.classList.add('info')
     document.getElementById('chat-messages')
         .appendChild(li)
 })
