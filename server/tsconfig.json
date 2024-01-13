@@ -7,11 +7,13 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "outDir": "./dist",
-    
-    // Add other compiler options as needed
+    "noEmit": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "isolatedModules": true
   },
   "include": [
-    "**/*.ts"
+    "src"
  ],
   "exclude": [
     "node_modules"
