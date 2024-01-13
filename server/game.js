@@ -79,7 +79,7 @@ function handleNewPlayerEnter(socket) {
         cardDeck.push(cardInfo)
     }
     
-    io.emit('initialCards', cardDeck)
+    socket.emit('initialCards', cardDeck)
 }
 
 // start Game, get game master
