@@ -103,3 +103,5 @@ io.on('connection', (socket) => {
         io.emit('broadcastMessage', messageInfo);
     });
 });
+
+export { io };

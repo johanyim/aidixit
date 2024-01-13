@@ -2,7 +2,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { getIo } from './socketSetup'; // Adjust the path based on your project structure
 import { Server, Socket } from 'socket.io';
-const io = getIo();
+import { io } from './server';
 // ------------------------------------------------------
 const phases = ['preparation', 'gameMasterSubmit', 'cardSubmission', 'voting', 'scoring']
 let currentPhaseId = 0

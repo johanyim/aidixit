@@ -1,12 +1,11 @@
 // socketSetup.js
 
-const socketIO = require('socket.io');
 import { Server } from "socket.io"
 
 let io; // This will store the Socket.IO instance
 
 function initializeSocket(server) {
-    const io = new Server(server, {
+     io = new Server(server, {
         //cross origin resource request
         cors: {
             origin: process.env.NODE_ENV === "production" ? false :
