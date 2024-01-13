@@ -1,8 +1,6 @@
 
 const socket = io('http://localhost:3000');
-
-
-
+const chatMessages = document.getElementById('chat-messages')
 // interface card
 // id:string
 // URL: string 
@@ -10,15 +8,27 @@ const socket = io('http://localhost:3000');
 socket.on('initialCards', (cards) => {
     // Check if imageURLs is an array
     if (Array.isArray(cards)) {
-        // Loop through the array of image URLs
-        const cardsList = document.getElementById('cards')
+
+        // Cards being played 
+        const playedCards = document.getElementById('played')
         cards.forEach((card) => {
             // Create an image element for each URL and append it to the body
             const URL = card.URL
             const img = document.createElement('img');
             img.classList.add("card")
             img.src = URL;
-            cardsList.appendChild(img);
+            playedCards.appendChild(img);
+        });
+        
+        // Cards in hand
+        const handCards = document.getElementById('hand')
+        cards.forEach((card) => {
+            // Create an image element for each URL and append it to the body
+            const URL = card.URL
+            const img = document.createElement('img');
+            img.classList.add("card")
+            img.src = URL;
+            handCards.appendChild(img);
         });
     } else {
         console.error('Received data is not an array:', imageURLs);
@@ -40,6 +50,7 @@ function sendMessage(e) {
         input.value = '';
     }
 
+
     input.focus()
 }
 
@@ -48,14 +59,25 @@ socket.on('broadcastMessage', (data) => {
     const li = document.createElement('li')
     li.textContent = data
     li.classList.add('chat')
-    document.getElementById('chat-messages')
-        .appendChild(li)
+    chatMessages.appendChild(li)
+    // chatMessages.scrollTo(0, chatMessages.scrollHeight);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 })
 
 socket.on('infoMessage', (data) => {
     const li = document.createElement('li')
     li.textContent = data
     li.classList.add('info')
-    document.getElementById('chat-messages')
-        .appendChild(li)
+    chatMessages.appendChild(li)
+    // chatMessages.scrollTo(0, chatMessages.scrollHeight);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+})
+
+socket.on('promptMessage', (data) => {
+    const li = document.createElement('li')
+    li.textContent = data
+    li.classList.add('prompt')
+    chatMessages.appendChild(li)
+    // chatMessages.scrollTo(0, chatMessages.scrollHeight);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 })

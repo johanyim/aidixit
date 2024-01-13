@@ -12,25 +12,20 @@
     
     <div class="game">
         <div class="playing-area">
-            <ul id="cards"></ul>
-
+            <ul id="played" class="cards"></ul>
         </div>
 
         <div class="user-area">
-
+            <ul id="hand" class="cards"></ul>
             <div id="chat-container">
-                <div class="message-container">
-                    <ul class="messages" id="chat-messages">
-                    </ul>
-                </div>
+                <ul class="messages" id="chat-messages"></ul>
                 <form id="message-form">
                     <input type="text" placeholder="Your message" id="message-input">
-                    <button type="submit">Send</button>
+                    <button type="submit" id="send-button">Send</button>
                 </form>
             </div>
 
         </div>
     </div>
-
 </body>
 </html>

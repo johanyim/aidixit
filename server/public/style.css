@@ -1,4 +1,4 @@
-* {margin:0;padding:0}
+* {margin:0;padding:0;box-sizing: border-box;}
 
 .game {
     display: flex;
@@ -10,51 +10,101 @@
     bottom: 0px;
 
     /* background: blue; */
-    padding: 40px;
+    border: 3px solid white;
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    
     
 }
 
-.message-container {
-    /* background: red; */
-    height: 30vh;
-    width:90vw;
+
+
+#chat-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#chat-messages {
+    height: 15vh;
+    width: 100%;
     border: 2px solid grey;
+    overflow-y: auto; 
+    background: white;
+    flex: 1 0 15vh;
+}
+
+#message-form {
+    flex: 1;
+    display: flex;
+}
+
+#message-input {
+    flex: 10;
+}
+
+#send-button {
+    flex: 0 0 4rem;
 }
 
 .messages {
     list-style: none;
-
 }
 
-.info {
+li.info {
     color: grey;
 }
-.chat {
-    color: grey;
+li.chat {
+    color: black;
 }
 
 
 
+.playing-area {
+    border: 10px solid red;
+    width: 100%;
+    max-height: 60vh; 
+}
 
-#cards {
+
+#played {
+    border: 3px solid black;
     align-self: center;
     flex: 0 0 auto;
     flex-wrap: wrap;
     display: flex;
+    justify-content: flex-start;
+    padding: 0 6vh;
+    gap: 2vh;
+}
+#played .card {
+    transform-origin: top center;
+}
+
+#hand {
+    border: 3px solid green;
+    align-self: center;
+    display: flex;
     justify-content: space-around;
-    padding: 0 5vh;
-    gap: 2vh
+    gap: 0vh;
+    width: 80%;
 
 }
+#hand .card {
+    transform-origin: bottom center;
+    margin: 0 -6vh;
+}
+
 
 
 .card:hover {
-    transform-origin: top center;
-    transform:  scale(2);
+    transform: scale(2);
+    z-index: 2;
 }
 
 .card {
-    transition: all 0.3s ease-out;
+    transition: transform 0.2s ease-in-out;
     flex: 0;
     aspect-ratio: 0.66;
     height: 18vh;
@@ -63,5 +113,4 @@
     border-radius: 5px;
     box-sizing: border-box;
 }
-
 

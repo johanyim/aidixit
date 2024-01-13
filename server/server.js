@@ -78,7 +78,6 @@ io.on('connection', (socket) => {
         io.emit('broadcastMessage', `${socket.id.substring(0,5)}: ${messageInfo}`) //from socket.send
     });
 
-
 });
 
 export { io };

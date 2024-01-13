@@ -173,7 +173,7 @@ function handleSubmitCard(socket, cardId) {
 function generateCard(playerId) {
     const cardId = uuidv4()
     const searchTerms = ['night', 'sky', 'grass', 'city', 'food', 'animal', 'sea', "nature", "cityscape", "technology", "anime", "programming", "travel", "architecture", "wildlife", "abstract", "vintage", "food", "portrait", "landscape", "ocean", "music", "sports", "night", "skyline", "artistic", "animals", "fashion", "science", "books", "fitness", "cars", "coffee", "space", "movies", "gaming", "holiday", "business", "street", "sunrise", "sunset", "beach", "mountains", "forest", "flowers", "rain", "snow", "urban", "colorful", "minimal", "texture", "water", "technology", "office", "people"];
-    const imageUrl = 'https://source.unsplash.com/random?' + Math.floor(Math.random() * searchTerms.length)
+    const imageUrl = 'https://source.unsplash.com/random?' + searchTerms[Math.floor(Math.random() * searchTerms.length)]
 
     const card = {
         imageUrl: imageUrl,
