@@ -44,8 +44,6 @@ function sendMessage(e) {
 }
 
 
-
-
 socket.on('broadcastMessage', (data) => {
     const li = document.createElement('li')
     li.textContent = data
