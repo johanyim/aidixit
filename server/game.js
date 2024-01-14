@@ -21,11 +21,16 @@ const defaultPlayer = {
     voted: false,
   };
 
+// interface CardInfo {
+//     id: string;
+//     imageUrl: string;
+// }
+
 // interface GameState {
 //     players: Player[];
 //     currentPhase: string;
 //     gameMaster: string;
-//     chosenCards: any[]; // Update this type based on your actual card structure
+//     chosenCards: CardInfo[]; // Update this type based on your actual card structure
 //     prompt: string;
 // }
 
@@ -51,7 +56,7 @@ const gameState = {
 
 // interface SentCardInfo {
 //     id:string
-//     URL : string
+//     url : string
 // }
 
 // const cards: Record<string, Card> = {}
@@ -82,7 +87,7 @@ function handleNewPlayerEnter(socket) {
 
     for (let i = 0; i < initialCardNumber; i++) {
         const cardId = generateCard(socket.id)
-        const cardInfo = { 'id': cardId, 'URL': cards[cardId].imageUrl }
+        const cardInfo = { 'id': cardId, 'url': cards[cardId].imageUrl }
         cardDeck.push(cardInfo)
     }
     
@@ -118,12 +123,7 @@ function handleGameMasterSubmitCard(socket, { prompt, cardId }) {
 
     if (player?.id === gameState.gameMaster) {
         player.submittedCard = true;
-
-        if (Array.isArray(cardId)) {
-            gameState.chosenCards = [...gameState.chosenCards, ...cardId]
-        } else {
-            gameState.chosenCards = [...gameState.chosenCards, cardId]
-        }
+        addChosenCard(cardId)
         io.emit('updateGameState', gameState);
 
     } else {
@@ -140,12 +140,7 @@ function handleSubmitCard(socket, cardId) {
 
     if (player) {
         player.submittedCard = true;
-
-        if (Array.isArray(cardId)) {
-            gameState.chosenCards = [...gameState.chosenCards, ...cardId]
-        } else {
-            gameState.chosenCards = [...gameState.chosenCards, cardId]
-        }
+        addChosenCard(cardId)
     }
 
     // Remove from its card deck, thinking whether to store card deck
@@ -195,6 +190,23 @@ function generateCard(playerId) {
 function updatePhase() {
     currentPhaseId += 1
     gameState.currentPhase = phases[currentPhaseId]
+}
+
+
+function addChosenCard(cardId){
+    if (Array.isArray(cardId)) {
+        const selectedCardInfo = cardId.map((id) => ({
+            id: id,
+            imageUrl: cards[id]?.imageUrl || "Image not found"
+        }));
+        gameState.chosenCards = [...gameState.chosenCardUrls, ...selectedCardInfo]
+    } else {
+        const selectedCardInfo = {
+            id: cardId,
+            imageUrl: cards[id]?.imageUrl || "Image not found"
+        };
+        gameState.chosenCards = [...gameState.chosenCards, selectedCardInfo]
+    }
 }
 
 

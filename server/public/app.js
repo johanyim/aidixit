@@ -1,37 +1,37 @@
 
 const socket = io('http://localhost:3000');
 const chatMessages = document.getElementById('chat-messages')
-// interface card
+// interface CardInfo
 // id:string
-// URL: string 
+// url: string 
 
 socket.on('initialCards', (cards) => {
-    // Check if imageURLs is an array
+    // Check if imageurls is an array
     if (Array.isArray(cards)) {
 
         // Cards being played 
         const playedCards = document.getElementById('played')
         cards.forEach((card) => {
-            // Create an image element for each URL and append it to the body
-            const URL = card.URL
+            // Create an image element for each url and append it to the body
+            const url = card.url
             const img = document.createElement('img');
             img.classList.add("card")
-            img.src = URL;
+            img.src = url;
             playedCards.appendChild(img);
         });
 
         // Cards in hand
         const handCards = document.getElementById('hand')
         cards.forEach((card) => {
-            // Create an image element for each URL and append it to the body
-            const URL = card.URL
+            // Create an image element for each url and append it to the body
+            const url = card.url
             const img = document.createElement('img');
             img.classList.add("card")
-            img.src = URL;
+            img.src = url;
             handCards.appendChild(img);
         });
     } else {
-        console.error('Received data is not an array:', imageURLs);
+        console.error('Received data is not an array:', cards);
     }
 });
 
@@ -43,15 +43,15 @@ socket.on('initialCards', (cards) => {
 //     voted: boolean;
 // }
 
+// const phases = ['preparation', 'gameMasterSubmit', 'othersSubmit', 'voting', 'scoring']
 // interface GameState {
 //     players: Player[];
 //     currentPhase: string;
-//     gameMaster: string;
-//     chosenCards: any[]; // Not implemented
+//     gameMaster: string; //playerId of the current gameMaster
+//     chosenCards: cardInfo[]; // // Include all the card infos submitted, use in voting phase (when all players submitted)
 //     prompt: string;
 // }
 
-// const phases = ['preparation', 'gameMasterSubmit', 'othersSubmit', 'voting', 'scoring']
 
 
 socket.on('updateGameState', (gameState) => {
@@ -65,8 +65,6 @@ socket.on('updateGameState', (gameState) => {
     // if(gameState.currentPhase === 'othersSubmit )
     // get cardId(s)
     // io.emit('otherSubmitCard', (cardId) 
-
-
 })
 
 
