@@ -4,6 +4,8 @@ This is a clone of the popular card/board game with the addition of using AI ima
 
 ## Motivation
 
+<img src="https://whatsericplaying.files.wordpress.com/2015/08/dixit-odyssey-013.jpg" width=200>
+
 Dixit is a family-friendly multiplayer card/board game that rewards imagination and skill. The cards featured in Dixit showcase dreamlike illustrations with ambiguous meanings and broad avenues for storytelling. 
 
 ## Basic Rules 
