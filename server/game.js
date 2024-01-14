@@ -199,7 +199,7 @@ function addChosenCard(cardId){
             id: id,
             imageUrl: cards[id]?.imageUrl || "Image not found"
         }));
-        gameState.chosenCards = [...gameState.chosenCardUrls, ...selectedCardInfo]
+        gameState.chosenCards = [...gameState.chosenCards, ...selectedCardInfo]
     } else {
         const selectedCardInfo = {
             id: cardId,
