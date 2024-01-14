@@ -58,6 +58,13 @@ const gameState = {
 const cards = {}
 const initialCardNumber = 6
 
+function handleNameSet(socket, name){
+    const player = gameState.players.find(player => player.id === socket.id);
+    player.name = name
+    
+    io.emit('updatePlayeres', gameState.players);
+}
+
 function handleNewPlayerEnter(socket) {
     //chat enter message
     socket.broadcast.emit('infoMessage', `${socket.id.substring(0,5)} has entered`) //from socket.send
@@ -196,4 +203,5 @@ export {
     handleGameMasterSubmitCard,
     handleSubmitCard,
     handleNewPlayerEnter,
+    handleNameSet,
 };

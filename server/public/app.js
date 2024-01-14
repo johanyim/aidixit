@@ -56,6 +56,8 @@ socket.on('initialCards', (cards) => {
 
 socket.on('updateGameState', (gameState) => {
     // if(gameState.currentPhase === 'gameMasterSubmit )
+    // if(gameState.gameMaster === socket.id) ///Current player is the gamemaster
+    // 
     // get prompt and cardId(s)
     // io.emit('gameMasterSubmitCard', ({prompt, cardId}) 
 
@@ -120,3 +122,9 @@ socket.on('promptMessage', (data) => {
     // chatMessages.scrollTo(0, chatMessages.scrollHeight);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 })
+
+// ------------------------------------------------------------------------------------------Backend Test
+// function backendTest(){
+//     socket.emit('setName', 'SKT');
+
+// }

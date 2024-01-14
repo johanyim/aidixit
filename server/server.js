@@ -14,6 +14,7 @@ import {
     handleGameMasterSubmitCard,
     handleSubmitCard,
     handleNewPlayerEnter,
+    handleNameSet,
   } from './game.js';
   
 // extra code to enable __dirname = "./"
@@ -76,6 +77,10 @@ io.on('connection', (socket) => {
     // Handle sending a chat message
     socket.on('sendMessage', (messageInfo) => {
         io.emit('broadcastMessage', `${socket.id.substring(0,5)}: ${messageInfo}`) //from socket.send
+    });
+
+    socket.on('setName', (name) => {
+        handleNameSet(socket, name)
     });
 
 });
