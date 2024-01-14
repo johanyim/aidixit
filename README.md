@@ -1,6 +1,11 @@
-# AIDixit
+<div align="center">
+  <h1>AIDixit</h1>
 
-This is a clone of the popular card/board game with the addition of using AI image generation to produce the cards. 
+  <p>
+    A online clone of the popular card/board game, Dixit, with the addition of using AI image generation to produce art on the fly. 
+  </p>
+
+</div>
 
 ## Motivation
 
