@@ -48,14 +48,14 @@ io.on('connection', (socket) => {
     });
     
     // storyteller card chosen
-    socket.on('gameMasterSubmitCard', ({prompt, cardInfo}) => {
-        handleGameMasterSubmitCard(socket, {prompt, cardInfo})
+    socket.on('gameMasterSubmitCard', ({prompt, cardId}) => {
+        handleGameMasterSubmitCard(socket, {prompt, cardId})
     });
 
     // guesser card chosen
     // cardInfo = { 'id': string, 'URL': string }
-    socket.on('submitCard', (cardInfo) => {
-        handleSubmitCard(socket, cardInfo)
+    socket.on('otherSubmitCard', (cardId) => {
+        handleSubmitCard(socket, cardId)
     });
 
     // socket.on('vote', (voteInfo) => {

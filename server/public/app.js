@@ -19,7 +19,7 @@ socket.on('initialCards', (cards) => {
             img.src = URL;
             playedCards.appendChild(img);
         });
-        
+
         // Cards in hand
         const handCards = document.getElementById('hand')
         cards.forEach((card) => {
@@ -34,6 +34,45 @@ socket.on('initialCards', (cards) => {
         console.error('Received data is not an array:', imageURLs);
     }
 });
+
+// interface Player {
+//     id: string;
+//     name: string;
+//     score: number;
+//     submittedCard: boolean;
+//     voted: boolean;
+// }
+
+// interface GameState {
+//     players: Player[];
+//     currentPhase: string;
+//     gameMaster: string;
+//     chosenCards: any[]; // Not implemented
+//     prompt: string;
+// }
+
+// const phases = ['preparation', 'gameMasterSubmit', 'othersSubmit', 'voting', 'scoring']
+
+
+socket.on('updateGameState', (gameState) => {
+    // if(gameState.currentPhase === 'gameMasterSubmit )
+    // get prompt and cardId(s)
+    // io.emit('gameMasterSubmitCard', ({prompt, cardId}) 
+
+
+    // if(gameState.currentPhase === 'othersSubmit )
+    // get cardId(s)
+    // io.emit('otherSubmitCard', (cardId) 
+
+
+})
+
+
+
+
+
+
+
 
 //------------------------- CHAT
 
