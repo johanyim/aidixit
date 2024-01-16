@@ -12,7 +12,7 @@ let currentPhaseId = 0
 //     voted: boolean;
 // }
 
-const defaultPlayer = {
+export const defaultPlayer = {
     id: '',
     name: '',
     score: 0,
@@ -64,6 +64,10 @@ const initialCardNumber = 6
 
 function handleNameSet(socket, name){
     const player = gameState.players.find(player => player.id === socket.id);
+    if (!player) {
+        console.error(`playerId not found ${socket.id}`)
+    }
+
     player.name = name
 
     return {to:'all',message:'updatePlayers', args:gameState.players}
@@ -71,7 +75,6 @@ function handleNameSet(socket, name){
 
 function handleNewPlayerEnter(socket) {
     //chat enter message
-    socket.broadcast.emit('infoMessage', `${socket.id.substring(0,5)} has entered`) //from socket.send
 
     const newPlayer = {
         ...defaultPlayer,
@@ -215,6 +218,9 @@ function addChosenCard(cardId){
     // }
 }
 
+function getGameState(){
+    return gameState
+}
 
 export {
     handleGameStart,
@@ -222,4 +228,5 @@ export {
     handleSubmitCard,
     handleNewPlayerEnter,
     handleNameSet,
+    getGameState,
 };

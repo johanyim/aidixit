@@ -41,6 +41,7 @@ const io = initializeSocket(expressServer)
 io.on('connection', (socket) => {
     // Create a new player and add them to the players array
     // also broadcasts a grey info message
+    socket.broadcast.emit('infoMessage', `${socket.id.substring(0,5)} has entered`) //from socket.send
     const res = handleNewPlayerEnter(socket)
     handleIO(socket, res)
 
