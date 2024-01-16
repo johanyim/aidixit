@@ -15,7 +15,6 @@ function initializeSocket(server) {
                 ]
         }
     })
-    // Add your Socket.IO event listeners or configuration here
 
     return io;
 }

@@ -117,6 +117,7 @@ li.chat {
     flex: 0;
     aspect-ratio: 0.66;
     height: 18vh;
+    min-width: 12vh;
     object-fit: cover;
     border: 5px solid grey;
     border-radius: 5px;

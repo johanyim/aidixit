@@ -1,15 +1,23 @@
 const socket = io('http://localhost:3000');
 const chatMessages = document.getElementById('chat-messages')
+const handCards = document.getElementById('hand')
+const messageInput = document.getElementById('message-input');
 // interface CardInfo
 // id:string
 // url: string 
+// import express from "express"
+// const express = require("express")
+
+
+// app.get("/index", (req, res) => {
+//   res.send("Welcome home");
+// });
 
 socket.on('initialCards', (cards) => {
     // Check if imageurls is an array
     if (Array.isArray(cards)) {
 
         // Cards in hand
-        const handCards = document.getElementById('hand')
         cards.forEach((card) => {
             // Create an image element for each url and append it to the body
             
@@ -97,15 +105,14 @@ document.getElementById('message-form')
 
 function sendMessage(e) {
     e.preventDefault();
-    const input = document.getElementById('message-input');
-    if (input.value) {
+    if (messageInput.value) {
         // Emit the 'chatMessage' event to the server
-        socket.emit('sendMessage', input.value);
-        input.value = '';
+        socket.emit('sendMessage', messageInput.value);
+        messageInput.value = '';
     }
 
 
-    input.focus()
+    messageInput.focus()
 }
 
 
