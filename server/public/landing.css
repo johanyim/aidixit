@@ -1,0 +1,38 @@
+* {margin:0;padding:0;box-sizing: border-box;}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.user-container {
+    width: 30vw;
+    height: 20vh;
+
+    display:flex;
+    flex-direction: column;
+
+    align-items: center
+}
+
+#username-form {
+    width: 30vw;
+    height: 20vh;
+
+    background: blue;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
+#username {
+    width: 50%;
+}
+
+
+

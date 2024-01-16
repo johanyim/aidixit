@@ -2,6 +2,12 @@
 
 .game {
     display: flex;
+    flex-direction: column;
+}
+
+.info-area {
+    background: grey;
+    padding: 1vh;
 }
 
 .user-area {

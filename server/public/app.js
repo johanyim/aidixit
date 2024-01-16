@@ -34,6 +34,17 @@ socket.on('initialCards', (cards) => {
             })
             handCards.appendChild(img);
         });
+        // TESTING: 
+        const playedCards = document.getElementById('played')
+        cards.forEach((card) => {
+            // Create an image element for each url and append it to the body
+            const url = card.url
+            const img = document.createElement('img');
+            img.classList.add("card")
+            img.src = url;
+            playedCards.appendChild(img);
+        });
+        // -----
     } else {
         console.error('received data is not an array:', cards);
     }
