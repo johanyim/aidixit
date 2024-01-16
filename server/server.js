@@ -5,7 +5,7 @@
 // const path = require('path');
 
 import express from "express"
-import {initializeSocket} from './src/socketSetup.js'
+import { initializeSocket } from './src/socketSetup.js'
 
 import path from "path"
 
@@ -15,8 +15,8 @@ import {
     handleSubmitCard,
     handleNewPlayerEnter,
     handleNameSet,
-  } from './src/game.js';
-  
+} from './src/game.js';
+
 // extra code to enable __dirname = "./"
 import { fileURLToPath } from "url"
 const __filename = fileURLToPath(import.meta.url)
@@ -41,23 +41,30 @@ const io = initializeSocket(expressServer)
 io.on('connection', (socket) => {
     // Create a new player and add them to the players array
     // also broadcasts a grey info message
-    handleNewPlayerEnter(socket)
+    const res = handleNewPlayerEnter(socket)
+    handleIO(socket, res)
 
     // start Game, 
     socket.on('startGame', () => {
-        handleGameStart(socket)
+        const res = handleGameStart(socket)
+        handleIO(socket, res)
+
     });
-    
+
     // storyteller card chosen
-    socket.on('gameMasterSubmitCard', ({prompt, cardId}) => {
-        handleGameMasterSubmitCard(socket, {prompt, cardId})
+    socket.on('gameMasterSubmitCard', ({ prompt, cardId }) => {
+        const res = handleGameMasterSubmitCard(socket, { prompt, cardId })
+        handleIO(socket, res)
+
     });
 
     // guesser card chosen
     // cardInfo = { 'id': string, 'URL': string }
     socket.on('otherSubmitCard', (cardId) => {
         console.log(cardId)
-        handleSubmitCard(socket, cardId)
+        const res = handleSubmitCard(socket, cardId)
+        handleIO(socket, res)
+
     });
 
     // socket.on('vote', (voteInfo) => {
@@ -77,13 +84,28 @@ io.on('connection', (socket) => {
     // Chat events
     // Handle sending a chat message
     socket.on('sendMessage', (messageInfo) => {
-        io.emit('broadcastMessage', `${socket.id.substring(0,5)}: ${messageInfo}`) //from socket.send
+        io.emit('broadcastMessage', `${socket.id.substring(0, 5)}: ${messageInfo}`) //from socket.send
     });
 
     socket.on('setName', (name) => {
-        handleNameSet(socket, name)
+        const res = handleNameSet(socket, name)
+        handleIO(socket, res)
+
     });
 
 });
 
-export { io };
+// to = 'all' | 'sender'
+function handleIO(socket, res) {
+    // No response received 
+    if (res === null || res == undefined) return
+
+    const { to, message, args } = res
+
+    if (to === 'all') {
+        io.emit(message, args)
+    } else if (to === 'sender') {
+        socket.emit(message, args)
+    }
+
+}

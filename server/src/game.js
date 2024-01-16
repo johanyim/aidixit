@@ -1,6 +1,5 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { io } from '../server.js';
 // ------------------------------------------------------
 const phases = ['preparation', 'gameMasterSubmit', 'othersSubmit', 'voting', 'scoring']
 let currentPhaseId = 0
@@ -61,13 +60,13 @@ const gameState = {
 
 // const cards: Record<string, Card> = {}
 const cards = {}
-const initialCardNumber = 30
+const initialCardNumber = 6
 
 function handleNameSet(socket, name){
     const player = gameState.players.find(player => player.id === socket.id);
     player.name = name
-    
-    io.emit('updatePlayeres', gameState.players);
+
+    return {to:'all',message:'updatePlayers', args:gameState.players}
 }
 
 function handleNewPlayerEnter(socket) {
@@ -91,22 +90,26 @@ function handleNewPlayerEnter(socket) {
         cardDeck.push(cardInfo)
     }
     
-    socket.emit('initialCards', cardDeck)
+    return {to:'sender',message:'initialCards', args:cardDeck}
+
 }
 
 // start Game, get game master
 function handleGameStart() {
+    // TODO: Maybe change 0 to 1 in the future
     if (gameState.players.length > 0) {
         updatePhase()
         // Randomly select a game master
         gameState.gameMaster = gameState.players[Math.floor(Math.random() * gameState.players.length)].id;
-        io.emit('updateGameState', gameState);
+        return {to:'all',message:'updateGameState', args:gameState}
+
 
     } else {
         // Handle the case where there are no players, perhaps emit an error event
         console.log("Cannot start the game without players.");
         // You might want to emit an error event to inform clients or take appropriate action
-        io.emit('gameError', 'Cannot start the game without players.');
+        return {to:'all',message:'gameError', args:'Cannot start the game without players.'}
+
     }
 };
 
@@ -124,13 +127,15 @@ function handleGameMasterSubmitCard(socket, { prompt, cardId }) {
     if (player?.id === gameState.gameMaster) {
         player.submittedCard = true;
         addChosenCard(cardId)
-        io.emit('updateGameState', gameState);
+        return {to:'all',message:'updateGameState', args:gameState}
+
 
     } else {
         // Handle the case where there are no players, perhaps emit an error event
-        console.log("Submited by not gameMaster.");
+        console.log("Cannot start the game without players.");
         // You might want to emit an error event to inform clients or take appropriate action
-        io.emit('gameMasterPhaseError', '"Submited by not gameMaster.');
+        return {to:'all',message:'gameError', args:'Cannot start the game without players.'}
+
     }
 }
 
@@ -156,7 +161,7 @@ function handleSubmitCard(socket, cardId) {
 
     if (allPlayersSubmitted) {
         updatePhase();
-        io.emit('updateGameState', gameState);
+        return {to:'all',message:'updateGameState', args:gameState}
     }
 }
 
