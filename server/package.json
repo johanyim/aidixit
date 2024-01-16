@@ -8,11 +8,11 @@
     "uuid": "^9.0.1"
   },
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon src/server.js"
   },
   "name": "aidixit",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "src/server.js",
   "type": "module",
   "keywords": [],
   "author": "",

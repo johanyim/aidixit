@@ -1,4 +1,3 @@
-
 const socket = io('http://localhost:3000');
 const chatMessages = document.getElementById('chat-messages')
 // interface CardInfo
@@ -8,7 +7,6 @@ const chatMessages = document.getElementById('chat-messages')
 socket.on('initialCards', (cards) => {
     // Check if imageurls is an array
     if (Array.isArray(cards)) {
-
         // Cards being played 
         const playedCards = document.getElementById('played')
         cards.forEach((card) => {
@@ -19,7 +17,6 @@ socket.on('initialCards', (cards) => {
             img.src = url;
             playedCards.appendChild(img);
         });
-
         // Cards in hand
         const handCards = document.getElementById('hand')
         cards.forEach((card) => {
@@ -31,7 +28,7 @@ socket.on('initialCards', (cards) => {
             handCards.appendChild(img);
         });
     } else {
-        console.error('Received data is not an array:', cards);
+        console.error('received data is not an array:', cards);
     }
 });
 
