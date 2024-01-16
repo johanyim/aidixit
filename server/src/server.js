@@ -56,6 +56,7 @@ io.on('connection', (socket) => {
     // guesser card chosen
     // cardInfo = { 'id': string, 'URL': string }
     socket.on('otherSubmitCard', (cardId) => {
+        console.log(cardId)
         handleSubmitCard(socket, cardId)
     });
 

@@ -7,6 +7,34 @@ const chatMessages = document.getElementById('chat-messages')
 socket.on('initialCards', (cards) => {
     // Check if imageurls is an array
     if (Array.isArray(cards)) {
+
+        // Cards in hand
+        const handCards = document.getElementById('hand')
+        cards.forEach((card) => {
+            // Create an image element for each url and append it to the body
+            
+            // filler id for testing
+            const id = Math.floor(Math.random() * 10000000);
+
+            const url = card.url
+            const img = document.createElement('img');
+            img.classList.add("card")
+            img.src = url;
+            img.addEventListener('click', () => {
+                console.log(url);
+                socket.emit('otherSubmitCard', (id))
+            })
+            handCards.appendChild(img);
+        });
+    } else {
+        console.error('received data is not an array:', cards);
+    }
+});
+
+
+socket.on('cardsPlayed', (cards) => {
+    if (Array.isArray(cards)) {
+
         // Cards being played 
         const playedCards = document.getElementById('played')
         cards.forEach((card) => {
@@ -17,20 +45,10 @@ socket.on('initialCards', (cards) => {
             img.src = url;
             playedCards.appendChild(img);
         });
-        // Cards in hand
-        const handCards = document.getElementById('hand')
-        cards.forEach((card) => {
-            // Create an image element for each url and append it to the body
-            const url = card.url
-            const img = document.createElement('img');
-            img.classList.add("card")
-            img.src = url;
-            handCards.appendChild(img);
-        });
     } else {
         console.error('received data is not an array:', cards);
     }
-});
+})
 
 // interface Player {
 //     id: string;

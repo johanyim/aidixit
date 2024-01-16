@@ -10,7 +10,7 @@
     bottom: 0px;
 
     /* background: blue; */
-    border: 3px solid white;
+    /* border: 3px solid white; */
     box-sizing: border-box;
     width: 100%;
     display: flex;
@@ -87,7 +87,8 @@ li.chat {
 }
 
 #hand {
-    border: 3px solid green;
+    /* border: 3px solid green; */
+    margin-bottom: 1vh;
     align-self: center;
     display: flex;
     justify-content: space-around;
@@ -120,5 +121,11 @@ li.chat {
     border: 5px solid grey;
     border-radius: 5px;
     box-sizing: border-box;
+    cursor: pointer;
+}
+
+.card.selected {
+
+    border: 5px solid green;
 }
 

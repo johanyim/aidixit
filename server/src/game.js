@@ -194,19 +194,20 @@ function updatePhase() {
 
 
 function addChosenCard(cardId){
-    if (Array.isArray(cardId)) {
-        const selectedCardInfo = cardId.map((id) => ({
-            id: id,
-            imageUrl: cards[id]?.imageUrl || "Image not found"
-        }));
-        gameState.chosenCards = [...gameState.chosenCards, ...selectedCardInfo]
-    } else {
+    // // only if cardId is an array
+    // if (Array.isArray(cardId)) {
+    //     const selectedCardInfo = cardId.map((id) => ({
+    //         id: id,
+    //         imageUrl: cards[id]?.imageUrl || "Image not found"
+    //     }));
+    //     gameState.chosenCards = [...gameState.chosenCards, ...selectedCardInfo]
+    // } else {
         const selectedCardInfo = {
             id: cardId,
-            imageUrl: cards[id]?.imageUrl || "Image not found"
+            imageUrl: cards[cardId]?.imageUrl || "Image not found"
         };
         gameState.chosenCards = [...gameState.chosenCards, selectedCardInfo]
-    }
+    // }
 }
 
 
