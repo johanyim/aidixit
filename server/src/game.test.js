@@ -6,36 +6,134 @@ const {
     handleNameSet,
     getGameState,
     defaultPlayer,
-} = require( './game.js');
+    setTesting,
+} = require('./game.js');
 
 const phases = ['preparation', 'gameMasterSubmit', 'othersSubmit', 'voting', 'scoring']
 let currentPhaseId = 0
 
+const sockets = []
+const players = []
+
 const gameState = {
-    players: [],
+    players: players,
     currentPhase: phases[currentPhaseId], // phases[0]
     gameMaster: '', // ID of the current game master
     chosenCards: [],
     prompt: '',
 };
 
-const socket = {id:'1'};
-const newPlayer1 = structuredClone(defaultPlayer)
-newPlayer1.id = '1'
+setTesting()
 
-test('player 1 enter', () => {
-    handleNewPlayerEnter(socket)
-    gameState.players = [newPlayer1]
-    
+function addNewPlayer() {
+    const newSocket = { id: players.length }
+    sockets.push(newSocket)
+
+    const newPlayer = structuredClone(defaultPlayer);
+    newPlayer.id = players.length
+    players.push(newPlayer);
+}
+
+describe('test players join and ', () => {
+    test('player 0 enter', () => {
+        addNewPlayer()
+        handleNewPlayerEnter(sockets[0])
+
+        expect(getGameState()).toEqual(gameState);
+    });
+
+    test('player 1 enter', () => {
+        addNewPlayer()
+        handleNewPlayerEnter(sockets[1])
+
+        expect(getGameState()).toEqual(gameState);
+    });
+
+    test('player 2 enter', () => {
+        addNewPlayer()
+        handleNewPlayerEnter(sockets[2])
+
+        expect(getGameState()).toEqual(gameState);
+    });
+
+})
+
+describe('test change names ', () => {
+    test('change player 0 name', () => {
+        const newName = 'Player 0'
+        handleNameSet(sockets[0], newName)
+
+        players[0].name = newName
+
+        expect(getGameState()).toEqual(gameState);
+    });
+
+
+    test('change player 1 name', () => {
+        const newName = 'Player 1'
+        handleNameSet(sockets[1], newName)
+
+        players[1].name = newName
+
+        expect(getGameState()).toEqual(gameState);
+    });
+
+})
+
+test('handleGameStart', () => {
+    currentPhaseId += 1
+    gameState.currentPhase = phases[currentPhaseId]
+
+    handleGameStart()
+    const resGameState = getGameState()
+    expect(resGameState.currentPhase).toBe(gameState.currentPhase);
+
+    const idArrays = Array.from({ length: players.length }, (_, index) => index)
+    expect(idArrays).toContain(resGameState.gameMaster);
+
+    // Set the same game master
+    gameState.gameMaster = resGameState.gameMaster
+});
+
+test('game master submit card', () => {
+    const gm = gameState.gameMaster
+    const prompt = 'banana'
+    const cardId = 1
+    handleGameMasterSubmitCard(sockets[gm], { prompt: prompt, cardId: cardId })
+
+    players[gm].submittedCard = true
+    gameState.prompt = prompt
+    gameState.chosenCards = [{ id: cardId, imageUrl: cardId }]
+    currentPhaseId += 1
+    gameState.currentPhase = phases[currentPhaseId]
+
     expect(getGameState()).toEqual(gameState);
 });
 
-test('change player name', () => {
-    const newName = 'Player 1'
-    handleNameSet(socket, newName)
+test('others submit card', () => {
+    const gm = gameState.gameMaster
+    let remain = players.length - 1
 
-    newPlayer1.name = newName
-    gameState.players = [newPlayer1]
+    for (let i = 0; i < players.length; i++) {
+        if (i !== gm) {
+            // select first 2 cards
+            const cardId1 = i * 6 + 1
+            const cardId2 = i * 6 + 2
+            handleSubmitCard(sockets[i], [cardId1,cardId2])
+            players[i].submittedCard = true
+            gameState.chosenCards.push({ id: cardId1, imageUrl: cardId1 })
+            gameState.chosenCards.push({ id: cardId2, imageUrl: cardId2 })
 
-    expect(getGameState()).toEqual(gameState);
+            remain -= 1
+            //Check if it is the last player to submit
+            if (remain === 0) {
+                currentPhaseId += 1
+                gameState.currentPhase = phases[currentPhaseId]
+            }
+        }
+        expect(getGameState()).toEqual(gameState);
+    }
 });
+
+
+

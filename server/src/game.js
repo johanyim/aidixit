@@ -18,7 +18,7 @@ export const defaultPlayer = {
     score: 0,
     submittedCard: false,
     voted: false,
-  };
+};
 
 // interface CardInfo {
 //     id: string;
@@ -62,7 +62,7 @@ const gameState = {
 const cards = {}
 const initialCardNumber = 6
 
-function handleNameSet(socket, name){
+function handleNameSet(socket, name) {
     const player = gameState.players.find(player => player.id === socket.id);
     if (!player) {
         console.error(`playerId not found ${socket.id}`)
@@ -70,7 +70,7 @@ function handleNameSet(socket, name){
 
     player.name = name
 
-    return {to:'all',message:'updatePlayers', args:gameState.players}
+    return { to: 'all', message: 'updatePlayers', args: gameState.players }
 }
 
 function handleNewPlayerEnter(socket) {
@@ -92,8 +92,8 @@ function handleNewPlayerEnter(socket) {
         const cardInfo = { 'id': cardId, 'url': cards[cardId].imageUrl }
         cardDeck.push(cardInfo)
     }
-    
-    return {to:'sender',message:'initialCards', args:cardDeck}
+
+    return { to: 'sender', message: 'initialCards', args: cardDeck }
 
 }
 
@@ -104,14 +104,14 @@ function handleGameStart() {
         updatePhase()
         // Randomly select a game master
         gameState.gameMaster = gameState.players[Math.floor(Math.random() * gameState.players.length)].id;
-        return {to:'all',message:'updateGameState', args:gameState}
+        return { to: 'all', message: 'updateGameState', args: gameState }
 
 
     } else {
         // Handle the case where there are no players, perhaps emit an error event
         console.log("Cannot start the game without players.");
         // You might want to emit an error event to inform clients or take appropriate action
-        return {to:'all',message:'gameError', args:'Cannot start the game without players.'}
+        return { to: 'all', message: 'gameError', args: 'Cannot start the game without players.' }
 
     }
 };
@@ -130,14 +130,14 @@ function handleGameMasterSubmitCard(socket, { prompt, cardId }) {
     if (player?.id === gameState.gameMaster) {
         player.submittedCard = true;
         addChosenCard(cardId)
-        return {to:'all',message:'updateGameState', args:gameState}
+        return { to: 'all', message: 'updateGameState', args: gameState }
 
 
     } else {
         // Handle the case where there are no players, perhaps emit an error event
         console.log("Cannot start the game without players.");
         // You might want to emit an error event to inform clients or take appropriate action
-        return {to:'all',message:'gameError', args:'Cannot start the game without players.'}
+        return { to: 'all', message: 'gameError', args: 'Cannot start the game without players.' }
 
     }
 }
@@ -164,7 +164,7 @@ function handleSubmitCard(socket, cardId) {
 
     if (allPlayersSubmitted) {
         updatePhase();
-        return {to:'all',message:'updateGameState', args:gameState}
+        return { to: 'all', message: 'updateGameState', args: gameState }
     }
 }
 
@@ -180,10 +180,20 @@ function handleSubmitCard(socket, cardId) {
 //     io.emit('updateGameState', updatedGameState);
 // });
 
+let isTesting = false
+let count = 1
+
 function generateCard(playerId) {
-    const cardId = uuidv4()
-    const searchTerms = ['night', 'sky', 'grass', 'city', 'food', 'animal', 'sea', "nature", "cityscape", "technology", "anime", "programming", "travel", "architecture", "wildlife", "abstract", "vintage", "food", "portrait", "landscape", "ocean", "music", "sports", "night", "skyline", "artistic", "animals", "fashion", "science", "books", "fitness", "cars", "coffee", "space", "movies", "gaming", "holiday", "business", "street", "sunrise", "sunset", "beach", "mountains", "forest", "flowers", "rain", "snow", "urban", "colorful", "minimal", "texture", "water", "technology", "office", "people"];
-    const imageUrl = 'https://source.unsplash.com/random?' + searchTerms[Math.floor(Math.random() * searchTerms.length)]
+    let cardId, imageUrl;
+    if (!isTesting) {
+        cardId = uuidv4()
+        const searchTerms = ['night', 'sky', 'grass', 'city', 'food', 'animal', 'sea', "nature", "cityscape", "technology", "anime", "programming", "travel", "architecture", "wildlife", "abstract", "vintage", "food", "portrait", "landscape", "ocean", "music", "sports", "night", "skyline", "artistic", "animals", "fashion", "science", "books", "fitness", "cars", "coffee", "space", "movies", "gaming", "holiday", "business", "street", "sunrise", "sunset", "beach", "mountains", "forest", "flowers", "rain", "snow", "urban", "colorful", "minimal", "texture", "water", "technology", "office", "people"];
+        imageUrl = 'https://source.unsplash.com/random?' + searchTerms[Math.floor(Math.random() * searchTerms.length)]
+    } else {
+        cardId = count
+        imageUrl = count
+        count += 1
+    }
 
     const card = {
         imageUrl: imageUrl,
@@ -201,25 +211,29 @@ function updatePhase() {
 }
 
 
-function addChosenCard(cardId){
+function addChosenCard(cardId) {
     // // only if cardId is an array
-    // if (Array.isArray(cardId)) {
-    //     const selectedCardInfo = cardId.map((id) => ({
-    //         id: id,
-    //         imageUrl: cards[id]?.imageUrl || "Image not found"
-    //     }));
-    //     gameState.chosenCards = [...gameState.chosenCards, ...selectedCardInfo]
-    // } else {
+    if (Array.isArray(cardId)) {
+        const selectedCardInfo = cardId.map((id) => ({
+            id: id,
+            imageUrl: cards[id]?.imageUrl || "Image not found"
+        }));
+        gameState.chosenCards = [...gameState.chosenCards, ...selectedCardInfo]
+    } else {
         const selectedCardInfo = {
             id: cardId,
             imageUrl: cards[cardId]?.imageUrl || "Image not found"
         };
         gameState.chosenCards = [...gameState.chosenCards, selectedCardInfo]
-    // }
+    }
 }
 
-function getGameState(){
+function getGameState() {
     return gameState
+}
+
+function setTesting() {
+    isTesting = true
 }
 
 export {
@@ -229,4 +243,5 @@ export {
     handleNewPlayerEnter,
     handleNameSet,
     getGameState,
+    setTesting,
 };
