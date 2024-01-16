@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { io } from './server.js';
+import { io } from '../server.js';
 // ------------------------------------------------------
 const phases = ['preparation', 'gameMasterSubmit', 'othersSubmit', 'voting', 'scoring']
 let currentPhaseId = 0

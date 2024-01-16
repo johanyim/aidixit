@@ -5,7 +5,7 @@
 // const path = require('path');
 
 import express from "express"
-import {initializeSocket} from './socketSetup.js'
+import {initializeSocket} from './src/socketSetup.js'
 
 import path from "path"
 
@@ -15,7 +15,7 @@ import {
     handleSubmitCard,
     handleNewPlayerEnter,
     handleNameSet,
-  } from './game.js';
+  } from './src/game.js';
   
 // extra code to enable __dirname = "./"
 import { fileURLToPath } from "url"
