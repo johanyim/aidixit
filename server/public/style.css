@@ -1,9 +1,77 @@
+
+/* || general  */
 * {margin:0;padding:0;box-sizing: border-box;}
 
-.game {
+/* || page navigation */
+.page {
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    z-index: 0;
+    display: none;
+    visibility: hidden;
+}
+
+.page:target {
+    display: block;
+    visibility: visible;
+}
+
+.page:not(:target) {
+    display: none;
+    visibility: hidden;
+    height: 0; width:0;
+}
+
+/* || landing */
+
+#landing {
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    display: flex;
+}
+
+.user-container {
+    width: 60vw;
+    height: 20vh;
+
+    display:flex;
+    flex-direction: column;
+
+    align-items: center
+}
+
+#username-form {
+    width: 30vw;
+    height: 20vh;
+
+    background: blue;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
 }
+
+#username {
+    width: 50%;
+}
+
+
+
+/* || lobby */
+
+#lobby-selection {
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    display: flex;
+
+
+}
+
+
+
 
 .info-area {
     background: grey;
@@ -64,14 +132,12 @@ li.chat {
 }
 
 
+/* || Cards being played  */
 
 .playing-area {
     /* border: 10px solid red; */
     width: 100%;
     height: 100vh; 
-    /* overflow-y: scroll; */
-    /* overflow-y: scroll; */
-    /* overflow: auto; */
     overflow: scroll;
 }
 

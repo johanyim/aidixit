@@ -1,18 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title></title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="landing.css" rel="stylesheet">
-    </head>
-    <body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIDixit</title>
+  <link href="style.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.3/socket.io.min.js" integrity="sha512-uxgT9qpJ2dYbAdKgbmD+b9e5rEta2gULQno8q0mm8t7CNLUwIOm7V3ALywTg6dAIbw9JxGi6aa3RCRLRdSW15Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="./app.js" defer></script>
+</head>
+
+<body onload='location.href="#landing"'>
+
+    <div id="landing" class="page">
         <h1>AI Dixit</h1>
         <div class="user-container">
             <form id="username-form">
                 <input type="text" id="username" placeholder="Your name">
                 <button type="submit">Go</button>
             </form>
+            <a href="#lobby-selection">Go to lobby</a>
+            
         </div>
-    </body>
+    </div>
+
+    <div id="lobby-selection" class="page">
+        <h1>AI Dixit</h1>
+        <a href="#game"><h2>go to game</h2></a>
+    </div>
+
+    <div id="game" class="page">
+        <div class="info-area">
+            <p class="room-name">Room name:</p>
+        </div>
+        <div class="playing-area">
+            <ul id="played" class="cards"></ul>
+        </div>
+
+        <div class="user-area">
+            <ul id="hand" class="cards"></ul>
+            <div id="chat-container">
+                <ul class="messages" id="chat-messages"></ul>
+                <form id="message-form">
+                    <input type="text" placeholder="Your message" id="message-input">
+                    <button type="submit" id="send-button">Send</button>
+                </form>
+            </div>
+
+            <!-- <button type="submit" id="backendTest-button" onclick=backendTest()>backendTest</button>  -->
+        </div>
+    </div>
+</body>
 </html>
