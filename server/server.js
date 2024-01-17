@@ -27,6 +27,9 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.static(path.join(__dirname, "public")))
 
+app.get('/', (req, res) => {
+    res.redirect('/index.html#landing');
+});
 
 const expressServer = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
