@@ -1,6 +1,12 @@
 
 /* || general  */
-* {margin:0;padding:0;box-sizing: border-box;}
+* {
+    margin:0;padding:0;
+    box-sizing: border-box;
+}
+*:focus {
+    outline:none;
+}
 
 /* || page navigation */
 .page {
@@ -28,33 +34,58 @@
 #landing {
     flex-direction: column;
     align-items: center;
+    align-self: center;
     justify-content: space-around;
     display: flex;
 }
 
-.user-container {
+.form-container {
+    background: white;
+    border: 5px solid black;
+    border-radius: 2vh;
+    height: 50vh;
     width: 60vw;
-    height: 20vh;
 
     display:flex;
     flex-direction: column;
 
     align-items: center
 }
-
-#username-form {
-    width: 30vw;
-    height: 20vh;
-
-    background: blue;
+h1 {
+    flex: 0;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: space-around;
 }
 
+#username-form {
+    width: 80%;
+    /* border: 1px solid blue; */
+    align-items: center;
+    justify-content: space-around;
+    display: block;
+}
+
+
 #username {
-    width: 50%;
+    font-size: 2rem;
+    padding: 4rem 0 ;
+    flex: 0 0 10vh;
+    border: none;
+    background: none;
+    width: 100%;
+}
+
+#username-form button {
+    font-size: 2rem;
+    flex: 1;
+    border: 5px solid black;
+    margin: 0;
+    width: 100%;
+    padding: 3vh;
+}
+#username-form button:hover {
+    background: grey;
 }
 
 
