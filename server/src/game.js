@@ -44,7 +44,7 @@ export const defaultGameState = {
         // },
     ],
     currentPhase: phases[currentPhaseId], // phases[0]
-    gameMaster: '', // ID of the current game master
+    gameMaster: -1, // ID of the current game master
     chosenCards: [],
     prompt: '',
     votingResults:[],
@@ -272,6 +272,7 @@ function updatePhase() {
 function updateRound(){
     gameState.chosenCards = []
     gameState.prompt = ""
+    gameState.round+= 1
 
     const currentGMIndex = gameState.players.findIndex(player => player.id === gameState.gameMaster);
     const nextGMIndex = (currentGMIndex + 1) % gameState.players.length
