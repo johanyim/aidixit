@@ -6,7 +6,10 @@ const {
     handleNameSet,
     getGameState,
     defaultPlayer,
+    defaultGameState,
     setTesting,
+    handleScoring,
+    handleVoting,
 } = require('./game.js');
 
 const phases = ['preparation', 'gameMasterSubmit', 'othersSubmit', 'voting', 'scoring']
@@ -15,13 +18,8 @@ let currentPhaseId = 0
 const sockets = []
 const players = []
 
-const gameState = {
-    players: players,
-    currentPhase: phases[currentPhaseId], // phases[0]
-    gameMaster: '', // ID of the current game master
-    chosenCards: [],
-    prompt: '',
-};
+const gameState = structuredClone(defaultGameState)
+gameState.players = players
 
 setTesting()
 
@@ -103,7 +101,7 @@ test('game master submit card', () => {
 
     players[gm].submittedCard = true
     gameState.prompt = prompt
-    gameState.chosenCards = [{ id: cardId, imageUrl: cardId }]
+    gameState.chosenCards = [{ id: cardId, imageUrl: cardId, votedBy: [] }]
     currentPhaseId += 1
     gameState.currentPhase = phases[currentPhaseId]
 
@@ -121,8 +119,8 @@ test('others submit card', () => {
             const cardId2 = i * 6 + 2
             handleSubmitCard(sockets[i], [cardId1,cardId2])
             players[i].submittedCard = true
-            gameState.chosenCards.push({ id: cardId1, imageUrl: cardId1 })
-            gameState.chosenCards.push({ id: cardId2, imageUrl: cardId2 })
+            gameState.chosenCards.push({ id: cardId1, imageUrl: cardId1, votedBy: [] })
+            gameState.chosenCards.push({ id: cardId2, imageUrl: cardId2, votedBy: [] })
 
             remain -= 1
             //Check if it is the last player to submit
@@ -131,6 +129,31 @@ test('others submit card', () => {
                 gameState.currentPhase = phases[currentPhaseId]
             }
         }
+        expect(getGameState()).toEqual(gameState);
+    }
+});
+
+test('voting', () => {
+    for (let i = 0; i < players.length; i++) {
+        // Simulate each player is voting a random card in the deck
+        const player = players[i]
+        const voteIndex = Math.floor(gameState.chosenCards.length * Math.random())
+        const chosenCard = gameState.chosenCards[voteIndex]
+        player.hasVoted = true
+
+        gameState.votingResults.push({
+            voter: player,
+            cardId: chosenCard.id,
+        });
+
+        handleVoting(sockets[i], chosenCard.id)
+
+        //Check if is last one to vote
+        if (i === players.length-1) {
+            currentPhaseId += 1
+            gameState.currentPhase = phases[currentPhaseId]
+        }
+
         expect(getGameState()).toEqual(gameState);
     }
 });

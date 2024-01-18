@@ -15,6 +15,8 @@ import {
     handleSubmitCard,
     handleNewPlayerEnter,
     handleNameSet,
+    handleVoting,
+    handleScoring,
 } from './src/game.js';
 
 // extra code to enable __dirname = "./"
@@ -75,19 +77,17 @@ io.on('connection', (socket, room) => {
         handleIO(socket, res, room)
     });
 
-    // socket.on('vote', (voteInfo) => {
-    //     // Handle a player voting
-    //     // Emit 'updateGameState' to broadcast the updated game state
-    //     io.emit('updateGameState', updatedGameState);
-    // });
+    socket.on('vote', (cardId, room) => {
+        // Handle a player voting
+        // Emit 'updateGameState' to broadcast the updated game state
+        const res = handleVoting(socket, cardId)
+        handleIO(socket, res, room)
+    });
 
-    // socket.on('revealCard', () => {
-    //     // Handle revealing chosen cards
-    //     // Emit 'updateGameState' to broadcast the updated game state
-    //     io.emit('updateGameState', updatedGameState);
-    // });
-
-
+    socket.on('scoring', (room) => {
+        const res = handleScoring()
+        handleIO(socket, res, room)
+    });
 
     // Chat events
     // Handle sending a chat message
