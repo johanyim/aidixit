@@ -155,7 +155,15 @@ socket.on('promptMessage', (data) => {
 })
 
 // ------------------------------------------------------------------------------------------Backend Test
-// function backendTest(){
-//     socket.emit('setName', 'SKT');
+function backendTest(){
+    // socket.emit('setName', 'SKT');
 
-// }
+    // socket.emit('joinRoom', 'TEST', message => {
+    //     console.log(message)
+    // })
+
+    // socket.emit('getRooms', roomArray => {
+    //     console.log(roomArray)
+    // })
+
+}

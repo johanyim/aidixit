@@ -46,9 +46,9 @@ const io = initializeSocket(expressServer)
 io.on('connection', (socket, room) => {
     //  broadcasts a grey info message
     const infoMessage = {
-        to:'all',
-        message:  'infoMessage',
-        args:`${socket.id.substring(0, 5)} has entered`,
+        to: 'all',
+        message: 'infoMessage',
+        args: `${socket.id.substring(0, 5)} has entered`,
     }
     handleIO(socket, infoMessage, room)
 
@@ -93,8 +93,8 @@ io.on('connection', (socket, room) => {
     // Handle sending a chat message
     socket.on('sendMessage', (messageInfo, room) => {
         const res = {
-            to:'all',
-            message:  'broadcastMessage',
+            to: 'all',
+            message: 'broadcastMessage',
             args: `${socket.id.substring(0, 5)}: ${messageInfo}`,
         }
         handleIO(socket, res, room)
@@ -106,9 +106,26 @@ io.on('connection', (socket, room) => {
 
     });
 
+    // ------------------------- ROOMS RELATED ------------------------------
     socket.on('joinRoom', (room, cb) => {
         socket.join(room)
         cb(`Joined ${room}`)
+    });
+
+    socket.on('getRooms', (cb) => {
+        const roomsInfo = []
+        const allRooms = io.sockets.adapter.rooms;
+
+        for (const [roomName, socketIds] of allRooms.entries()) {
+            // Get the size of the Set to determine the number of sockets in the room
+            const length = socketIds.size;
+        
+            roomsInfo.push({
+                name: roomName,
+                length: length
+            });
+        }
+        cb(roomsInfo)
     });
 })
 
