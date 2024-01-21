@@ -147,7 +147,7 @@ io.on('connection', (socket) => {
     });
 })
 
-function joinRoom(socket, room) {
+function joinRoom(socket, room, leaveCurrent=true) {
     // Exit current room first
     if(leaveCurrent) leaveRoom(socket)
     socket.join(room)
@@ -163,7 +163,7 @@ function leaveRoom(socket){
 
     // BUG: causes recursive call with joinRoom
     // Back to lobby
-    joinRoom(socket, 'lobby', leaveCurrent=false)
+    joinRoom(socket, 'lobby', false)
 }
 
 // to = 'all' | 'sender'
