@@ -46,24 +46,24 @@ const socketToNameMap = {};
 // send images buffer
 io.on('connection', (socket) => {
     initializeConnection(socket);
-    handleIO(socket, createInfoMessage(socket));
-    handleIO(socket, handleNewPlayerEnter(socket));
     socket.on('setName', (name) => handleSetName(socket, name));
 
-    // ------------------------- GAME RELATED ------------------------------
+    // ------------------------- ROOMS RELATED ------------------------------
+    // Maybe put to when join room, (broadcast join)
+    handleIO(socket, createInfoMessage(socket));
+    socket.on('createRoom', (room, cb) => handleCreateRoom(socket, room, cb));
+    socket.on('joinRoom', (room, cb) => handleJoinRoom(socket, room, cb));
+    socket.on('getRooms', (cb) => handleGetRooms(cb));
+    socket.on('leaveRoom', (cb) => handleLeaveRoom(socket, cb));
 
+    // ------------------------- GAME RELATED ------------------------------
+    // Maybe put to when join room, (broadcast join)
+    handleIO(socket, handleNewPlayerEnter(socket));
     socket.on('startGame', () => handleGameEvent(socket, 'gameStart'));
     socket.on('gameMasterSubmitCard', ({ prompt, cardId }) => handleGameEvent(socket, 'gameMasterSubmitCard', { prompt, cardId }));
     socket.on('otherSubmitCard', cardId => handleGameEvent(socket, 'submitCard', cardId));
     socket.on('vote', cardId => handleGameEvent(socket, 'vote', cardId));
     socket.on('scoring', () => handleGameEvent(socket, 'scoring'));
-
-    // ------------------------- ROOMS RELATED ------------------------------
-
-    socket.on('createRoom', (room, cb) => handleCreateRoom(socket, room, cb));
-    socket.on('joinRoom', (room, cb) => handleJoinRoom(socket, room, cb));
-    socket.on('getRooms', (cb) => handleGetRooms(cb));
-    socket.on('leaveRoom', (cb) => handleLeaveRoom(socket, cb));
 
     // ------------------------- Chat RELATED ------------------------------
     // Handle sending a chat message
@@ -76,7 +76,7 @@ function initializeConnection(socket) {
     joinRoom(socket, 'lobby');
 }
 
-function handleSetName(socket, name){
+function handleSetName(socket, name) {
     // socketToNameMap[socket.id] = name
     const res = handleNameSet(socket, name)
     handleIO(socket, res)
@@ -118,6 +118,21 @@ function leaveRoom(socket) {
     joinRoom(socket, 'lobby', false)
 }
 
+function handleCreateRoom(socket, room, cb) {
+    joinRoom(socket, room)
+    cb(`Created and Joined ${room}`)
+}
+
+function handleJoinRoom(socket, room, cb) {
+    joinRoom(socket, room)
+    cb(`Joined ${room}`)
+}
+
+function handleLeaveRoom(socket, cb) {
+    leaveRoom(socket);
+    cb(`Left room`);
+}
+
 function handleGetRooms(cb) {
     const roomsInfo = []
     const allRooms = io.sockets.adapter.rooms;
@@ -135,21 +150,6 @@ function handleGetRooms(cb) {
         }
     }
     cb(roomsInfo)
-}
-
-function handleCreateRoom(socket, room, cb) {
-    joinRoom(socket, room)
-    cb(`Created and Joined ${room}`)
-}
-
-function handleJoinRoom(socket, room, cb) {
-    joinRoom(socket, room)
-    cb(`Joined ${room}`)
-}
-
-function handleLeaveRoom(socket, cb) {
-    leaveRoom(socket);
-    cb(`Left room`);
 }
 
 function handleGameEvent(socket, eventName, data = null) {
