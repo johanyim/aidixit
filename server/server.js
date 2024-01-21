@@ -15,6 +15,8 @@ import {
     handleSubmitCard,
     handleNewPlayerEnter,
     handleNameSet,
+    handleVoting,
+    handleScoring,
 } from './src/game.js';
 
 // extra code to enable __dirname = "./"
@@ -39,88 +41,140 @@ const expressServer = app.listen(PORT, () => {
 // const io = socketIO(server);
 const io = initializeSocket(expressServer)
 
+const socketToRoomMap = {};
 
 // send images buffer
-io.on('connection', (socket, room) => {
+io.on('connection', (socket) => {
+    socketToRoomMap[socket.id] = socket.id;
+    joinRoom(socket, 'lobby')
+
     //  broadcasts a grey info message
     const infoMessage = {
-        to:'all',
-        message:  'infoMessage',
-        args:`${socket.id.substring(0, 5)} has entered`,
+        to: 'all',
+        message: 'infoMessage',
+        args: `${socket.id.substring(0, 5)} has entered`,
     }
-    handleIO(socket, infoMessage, room)
+    handleIO(socket, infoMessage)
 
     const res = handleNewPlayerEnter(socket)
-    handleIO(socket, res, room)
+    handleIO(socket, res)
 
     // start Game, 
     socket.on('startGame', () => {
         const res = handleGameStart(socket)
-        handleIO(socket, res, room)
+        handleIO(socket, res)
 
     });
 
     // storyteller card chosen
-    socket.on('gameMasterSubmitCard', ({ prompt, cardId }, room) => {
+    socket.on('gameMasterSubmitCard', ({ prompt, cardId }) => {
         const res = handleGameMasterSubmitCard(socket, { prompt, cardId })
-        handleIO(socket, res, room)
+        handleIO(socket, res)
 
     });
 
     // guesser card chosen
     // cardInfo = { 'id': string, 'URL': string }
-    socket.on('otherSubmitCard', (cardId, room) => {
+    socket.on('otherSubmitCard', (cardId) => {
         console.log(cardId)
         const res = handleSubmitCard(socket, cardId)
-        handleIO(socket, res, room)
+        handleIO(socket, res)
     });
 
-    // socket.on('vote', (voteInfo) => {
-    //     // Handle a player voting
-    //     // Emit 'updateGameState' to broadcast the updated game state
-    //     io.emit('updateGameState', updatedGameState);
-    // });
+    socket.on('vote', (cardId) => {
+        // Handle a player voting
+        // Emit 'updateGameState' to broadcast the updated game state
+        const res = handleVoting(socket, cardId)
+        handleIO(socket, res)
+    });
 
-    // socket.on('revealCard', () => {
-    //     // Handle revealing chosen cards
-    //     // Emit 'updateGameState' to broadcast the updated game state
-    //     io.emit('updateGameState', updatedGameState);
-    // });
-
-
+    socket.on('scoring', () => {
+        const res = handleScoring()
+        handleIO(socket, res)
+    });
 
     // Chat events
     // Handle sending a chat message
-    socket.on('sendMessage', (messageInfo, room) => {
+    socket.on('sendMessage', (messageInfo) => {
         const res = {
-            to:'all',
-            message:  'broadcastMessage',
+            to: 'all',
+            message: 'broadcastMessage',
             args: `${socket.id.substring(0, 5)}: ${messageInfo}`,
         }
-        handleIO(socket, res, room)
+        handleIO(socket, res)
     });
 
-    socket.on('setName', (name, room) => {
+    socket.on('setName', (name) => {
         const res = handleNameSet(socket, name)
-        handleIO(socket, res, room)
+        handleIO(socket, res)
 
     });
+
+    // ------------------------- ROOMS RELATED ------------------------------
+    socket.on('createRoom', (room, cb) => {
+        joinRoom(socket, room)
+        cb(`Created and Joined ${room}`)
+    });
+
 
     socket.on('joinRoom', (room, cb) => {
-        socket.join(room)
+        joinRoom(socket, room)
         cb(`Joined ${room}`)
+    });
+
+    socket.on('getRooms', (cb) => {
+        const roomsInfo = []
+        const allRooms = io.sockets.adapter.rooms;
+        console.log('allRooms :>> ', allRooms);
+
+        for (const [roomName, socketIds] of allRooms.entries()) {
+            // Get the size of the Set to determine the number of sockets in the room
+            const length = socketIds.size;
+        
+            if (length > 0) {
+                roomsInfo.push({
+                    name: roomName,
+                    length: length
+                });
+            }
+        }
+        cb(roomsInfo)
+    });
+
+    socket.on('leaveRoom', () => {
+        leaveRoom(socket)
+        cb(`Left ${room}`)
     });
 })
 
+function joinRoom(socket, room) {
+    // Exit current room first
+    leaveRoom(socket)
+    socket.join(room)
+    socketToRoomMap[socket.id] = room;
+}
+
+function leaveRoom(socket){
+    const roomName = socketToRoomMap[socket.id];
+    if (roomName) {
+        socket.leave(roomName);
+        delete socketToRoomMap[socket.id];
+    } 
+
+    // Back to lobby
+    joinRoom(socket, 'lobby')
+}
+
 // to = 'all' | 'sender'
-function handleIO(socket, res, room) {
+function handleIO(socket, res) {
     // No response received 
     if (res === null || res == undefined) return
 
+    const room = socketToRoomMap[socket.id];
     const { to, message, args } = res
 
     if (to === 'all') {
-        if (room === undefined) {
+        if (room === undefined || room === null) {
             io.emit(message, args)
         } else {
             io.to(room).emit(message, args)
@@ -128,5 +182,4 @@ function handleIO(socket, res, room) {
     } else if (to === 'sender') {
         socket.emit(message, args)
     }
-
 }

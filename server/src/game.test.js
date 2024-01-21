@@ -6,7 +6,10 @@ const {
     handleNameSet,
     getGameState,
     defaultPlayer,
+    defaultGameState,
     setTesting,
+    handleScoring,
+    handleVoting,
 } = require('./game.js');
 
 const phases = ['preparation', 'gameMasterSubmit', 'othersSubmit', 'voting', 'scoring']
@@ -15,15 +18,16 @@ let currentPhaseId = 0
 const sockets = []
 const players = []
 
-const gameState = {
-    players: players,
-    currentPhase: phases[currentPhaseId], // phases[0]
-    gameMaster: '', // ID of the current game master
-    chosenCards: [],
-    prompt: '',
-};
+const gameState = structuredClone(defaultGameState)
+gameState.players = players
 
 setTesting()
+
+
+const expectGameStateToEqual = () => {
+    expect(getGameState()).toEqual(gameState);
+};
+
 
 function addNewPlayer() {
     const newSocket = { id: players.length }
@@ -34,68 +38,49 @@ function addNewPlayer() {
     players.push(newPlayer);
 }
 
+const simulatePlayerJoin = (socketIndex) => {
+    addNewPlayer();
+    handleNewPlayerEnter(sockets[socketIndex]);
+    expectGameStateToEqual();
+};
+
+const simulateChangeName = (socketIndex, newName) => {
+    handleNameSet(sockets[socketIndex], newName);
+    players[socketIndex].name = newName;
+    expectGameStateToEqual();
+};
+
 describe('test players join and ', () => {
-    test('player 0 enter', () => {
-        addNewPlayer()
-        handleNewPlayerEnter(sockets[0])
+    test('player 0 enter', () => simulatePlayerJoin(0));
+    test('player 1 enter', () => simulatePlayerJoin(1));
+    test('player 2 enter', () => simulatePlayerJoin(2));
+});
 
-        expect(getGameState()).toEqual(gameState);
-    });
-
-    test('player 1 enter', () => {
-        addNewPlayer()
-        handleNewPlayerEnter(sockets[1])
-
-        expect(getGameState()).toEqual(gameState);
-    });
-
-    test('player 2 enter', () => {
-        addNewPlayer()
-        handleNewPlayerEnter(sockets[2])
-
-        expect(getGameState()).toEqual(gameState);
-    });
-
-})
 
 describe('test change names ', () => {
-    test('change player 0 name', () => {
-        const newName = 'Player 0'
-        handleNameSet(sockets[0], newName)
-
-        players[0].name = newName
-
-        expect(getGameState()).toEqual(gameState);
-    });
-
-
-    test('change player 1 name', () => {
-        const newName = 'Player 1'
-        handleNameSet(sockets[1], newName)
-
-        players[1].name = newName
-
-        expect(getGameState()).toEqual(gameState);
-    });
-
-})
+    test('change player 0 name', () => simulateChangeName(0, 'Player 0'));
+    test('change player 1 name', () => simulateChangeName(1, 'Player 1'));
+});
 
 test('handleGameStart', () => {
+    //simulate game start
     currentPhaseId += 1
     gameState.currentPhase = phases[currentPhaseId]
 
     handleGameStart()
-    const resGameState = getGameState()
-    expect(resGameState.currentPhase).toBe(gameState.currentPhase);
+    const curGameState = getGameState()
+    expect(curGameState).toBe(gameState.currentPhase);
 
+    //Check if a gameMaster is selected
     const idArrays = Array.from({ length: players.length }, (_, index) => index)
-    expect(idArrays).toContain(resGameState.gameMaster);
+    expect(idArrays).toContain(curGameState.gameMaster);
 
     // Set the same game master
-    gameState.gameMaster = resGameState.gameMaster
+    gameState.gameMaster = curGameState.gameMaster
 });
 
 test('game master submit card', () => {
+    //simulate game master select a card and prompt
     const gm = gameState.gameMaster
     const prompt = 'banana'
     const cardId = 1
@@ -103,14 +88,15 @@ test('game master submit card', () => {
 
     players[gm].submittedCard = true
     gameState.prompt = prompt
-    gameState.chosenCards = [{ id: cardId, imageUrl: cardId }]
+    gameState.chosenCards = [{ id: cardId, imageUrl: cardId, votedBy: [] }]
     currentPhaseId += 1
     gameState.currentPhase = phases[currentPhaseId]
 
-    expect(getGameState()).toEqual(gameState);
+    expectGameStateToEqual();
 });
 
 test('others submit card', () => {
+    //simulate other people select 2 cards
     const gm = gameState.gameMaster
     let remain = players.length - 1
 
@@ -119,10 +105,10 @@ test('others submit card', () => {
             // select first 2 cards
             const cardId1 = i * 6 + 1
             const cardId2 = i * 6 + 2
-            handleSubmitCard(sockets[i], [cardId1,cardId2])
+            handleSubmitCard(sockets[i], [cardId1, cardId2])
             players[i].submittedCard = true
-            gameState.chosenCards.push({ id: cardId1, imageUrl: cardId1 })
-            gameState.chosenCards.push({ id: cardId2, imageUrl: cardId2 })
+            gameState.chosenCards.push({ id: cardId1, imageUrl: cardId1, votedBy: [] })
+            gameState.chosenCards.push({ id: cardId2, imageUrl: cardId2, votedBy: [] })
 
             remain -= 1
             //Check if it is the last player to submit
@@ -131,9 +117,40 @@ test('others submit card', () => {
                 gameState.currentPhase = phases[currentPhaseId]
             }
         }
-        expect(getGameState()).toEqual(gameState);
+        expectGameStateToEqual();
+
     }
 });
 
+test('voting', () => {
+    //simulate other people voting
+    const gm = gameState.gameMaster
+    let remain = players.length - 1
+
+    for (let i = 0; i < players.length; i++) {
+        // Simulate each player is voting a random card in the deck
+        if (i !== gm) {
+
+            const player = players[i]
+            const voteIndex = Math.floor(gameState.chosenCards.length * Math.random())
+            const chosenCard = gameState.chosenCards[voteIndex]
+            player.hasVoted = true
+
+            gameState.votingResults.push({
+                voter: player,
+                cardId: chosenCard.id,
+            });
+            handleVoting(sockets[i], chosenCard.id)
+
+            remain -= 1
+            //Check if it is the last player to vote
+            if (remain === 0) {
+                currentPhaseId += 1
+                gameState.currentPhase = phases[currentPhaseId]
+            }
+        }
+        expectGameStateToEqual();
+    }
+});
 
 

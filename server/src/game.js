@@ -17,7 +17,8 @@ export const defaultPlayer = {
     name: '',
     score: 0,
     submittedCard: false,
-    voted: false,
+    hasVoted: false,
+    score: 0,
 };
 
 // interface CardInfo {
@@ -33,7 +34,7 @@ export const defaultPlayer = {
 //     prompt: string;
 // }
 
-const gameState = {
+export const defaultGameState = {
     players: [
         // { id: 'socket id', 
         //     name: 'Player 1', 
@@ -43,10 +44,14 @@ const gameState = {
         // },
     ],
     currentPhase: phases[currentPhaseId], // phases[0]
-    gameMaster: '', // ID of the current game master
+    gameMaster: -1, // ID of the current game master
     chosenCards: [],
     prompt: '',
+    votingResults:[],
+    round:0
 };
+
+const gameState = structuredClone(defaultGameState)
 
 // interface Card {
 //     owner: string;
@@ -62,7 +67,7 @@ const gameState = {
 const cards = {}
 const initialCardNumber = 6
 
-function handleNameSet(socket, name) {
+export function handleNameSet(socket, name) {
     const player = gameState.players.find(player => player.id === socket.id);
     if (!player) {
         console.error(`playerId not found ${socket.id}`)
@@ -73,13 +78,12 @@ function handleNameSet(socket, name) {
     return { to: 'all', message: 'updatePlayers', args: gameState.players }
 }
 
-function handleNewPlayerEnter(socket) {
+export function handleNewPlayerEnter(socket) {
     //chat enter message
 
     const newPlayer = {
         ...defaultPlayer,
         'id': socket.id,
-        'score': 0,
     };
 
     gameState.players.push(newPlayer);
@@ -88,7 +92,7 @@ function handleNewPlayerEnter(socket) {
     const cardDeck = []
 
     for (let i = 0; i < initialCardNumber; i++) {
-        const cardId = generateCard(socket.id)
+        const cardId = generateCard(newPlayer)
         const cardInfo = { 'id': cardId, 'url': cards[cardId].imageUrl }
         cardDeck.push(cardInfo)
     }
@@ -98,7 +102,7 @@ function handleNewPlayerEnter(socket) {
 }
 
 // start Game, get game master
-function handleGameStart() {
+export function handleGameStart() {
     // TODO: Maybe change 0 to 1 in the future
     if (gameState.players.length > 0) {
         updatePhase()
@@ -122,7 +126,7 @@ function handleGameStart() {
 // } 
 
 // Game master submit card and prompt
-function handleGameMasterSubmitCard(socket, { prompt, cardId }) {
+export function handleGameMasterSubmitCard(socket, { prompt, cardId }) {
     updatePhase()
     gameState.prompt = prompt
     const player = gameState.players.find(player => player.id === socket.id);
@@ -143,7 +147,7 @@ function handleGameMasterSubmitCard(socket, { prompt, cardId }) {
 }
 
 // Other player submit cards
-function handleSubmitCard(socket, cardId) {
+export function handleSubmitCard(socket, cardId) {
     const player = gameState.players.find(player => player.id === socket.id);
 
     if (player) {
@@ -164,9 +168,59 @@ function handleSubmitCard(socket, cardId) {
 
     if (allPlayersSubmitted) {
         updatePhase();
+        //TODO: shuffle cards
         return { to: 'all', message: 'updateGameState', args: gameState }
     }
 }
+
+export function handleVoting(socket, cardId) {
+    const player = gameState.players.find(player => player.id === socket.id);
+
+    // if (player && gameState.currentPhase === 'voting' && !player.hasVoted) {
+    if (player && !player.hasVoted) {
+        // Update voting information
+        gameState.votingResults.push({
+            voter: player,
+            cardId,
+        });
+
+        player.hasVoted = true;
+
+        // Check if all players have voted
+        const allPlayersVoted = gameState.players.every(player => player.hasVoted);
+        if (allPlayersVoted) {
+            updatePhase();
+            return { to: 'all', message: 'updateGameState', args: gameState }
+        }
+    }
+}
+
+export function handleScoring(){
+    // if (gameState.currentPhase === 'scoring') {
+        // Calculate scores based on voting results
+    gameState.votingResults.forEach(vote => {
+        const votedCardId = vote.cardId;
+        
+        // TODO : figure out score logic
+        const submittedPlayer = cards[votedCardId].owner;
+        if (submittedPlayer) {
+            submittedPlayer.score++;
+        }
+        
+        //Reveal who vote the card
+        const chosenCard = gameState.chosenCards.find(card => card.id === votedCardId);
+        chosenCard.votedBy.push(vote.voter)
+    });
+
+    // Reveal who selected the cards
+    gameState.chosenCards.forEach(card => {
+        card.submittedBy = cards[card.id].owner
+    });
+
+    updatePhase();
+    return { to: 'all', message: 'updateGameState', args: gameState }
+}
+
 
 // socket.on('vote', (voteInfo) => {
 //     // Handle a player voting
@@ -207,41 +261,51 @@ function generateCard(playerId) {
 
 function updatePhase() {
     currentPhaseId += 1
+    if (currentPhaseId === phases.length){
+        currentPhaseId = 0
+        updateRound()
+    }
+
     gameState.currentPhase = phases[currentPhaseId]
 }
 
+function updateRound(){
+    gameState.chosenCards = []
+    gameState.prompt = ""
+    gameState.round+= 1
+
+    const currentGMIndex = gameState.players.findIndex(player => player.id === gameState.gameMaster);
+    const nextGMIndex = (currentGMIndex + 1) % gameState.players.length
+    const nextGM = gameState.players[nextGMIndex].id
+
+    gameState.gameMaster = nextGM
+}
 
 function addChosenCard(cardId) {
     // // only if cardId is an array
     if (Array.isArray(cardId)) {
         const selectedCardInfo = cardId.map((id) => ({
             id: id,
-            imageUrl: cards[id]?.imageUrl || "Image not found"
+            imageUrl: cards[id]?.imageUrl || "Image not found",
+            votedBy: []
         }));
         gameState.chosenCards = [...gameState.chosenCards, ...selectedCardInfo]
     } else {
         const selectedCardInfo = {
             id: cardId,
-            imageUrl: cards[cardId]?.imageUrl || "Image not found"
+            imageUrl: cards[cardId]?.imageUrl || "Image not found",
+            votedBy: []
         };
         gameState.chosenCards = [...gameState.chosenCards, selectedCardInfo]
     }
 }
 
-function getGameState() {
+export function getGameState() {
     return gameState
 }
 
-function setTesting() {
+export function setTesting() {
     isTesting = true
 }
 
-export {
-    handleGameStart,
-    handleGameMasterSubmitCard,
-    handleSubmitCard,
-    handleNewPlayerEnter,
-    handleNameSet,
-    getGameState,
-    setTesting,
-};
+
