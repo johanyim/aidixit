@@ -147,9 +147,9 @@ io.on('connection', (socket) => {
     });
 })
 
-function joinRoom(socket, room) {
+function joinRoom(socket, room, joinOnly=false) {
     // Exit current room first
-    leaveRoom(socket)
+    if(!joinOnly) leaveRoom(socket)
     socket.join(room)
     socketToRoomMap[socket.id] = room;
 }
@@ -162,7 +162,7 @@ function leaveRoom(socket){
     } 
 
     // Back to lobby
-    joinRoom(socket, 'lobby')
+    joinRoom(socket, 'lobby', joinOnly=true)
 }
 
 // to = 'all' | 'sender'
