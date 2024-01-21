@@ -1,4 +1,3 @@
-//
 // const express = require('express');
 // const http = require('http');
 // const socketIO = require('socket.io');
@@ -111,6 +110,7 @@ io.on('connection', (socket) => {
     });
 
     // ------------------------- ROOMS RELATED ------------------------------
+
     socket.on('createRoom', (room, cb) => {
         joinRoom(socket, room)
         cb(`Created and Joined ${room}`)
@@ -147,9 +147,9 @@ io.on('connection', (socket) => {
     });
 })
 
-function joinRoom(socket, room, joinOnly=false) {
+function joinRoom(socket, room) {
     // Exit current room first
-    if(!joinOnly) leaveRoom(socket)
+    if(leaveCurrent) leaveRoom(socket)
     socket.join(room)
     socketToRoomMap[socket.id] = room;
 }
@@ -161,8 +161,9 @@ function leaveRoom(socket){
         delete socketToRoomMap[socket.id];
     } 
 
+    // BUG: causes recursive call with joinRoom
     // Back to lobby
-    joinRoom(socket, 'lobby', joinOnly=true)
+    joinRoom(socket, 'lobby', leaveCurrent=false)
 }
 
 // to = 'all' | 'sender'
@@ -183,3 +184,4 @@ function handleIO(socket, res) {
         socket.emit(message, args)
     }
 }
+
