@@ -165,5 +165,4 @@ function backendTest(){
     // socket.emit('getRooms', roomArray => {
     //     console.log(roomArray)
     // })
-
 }
