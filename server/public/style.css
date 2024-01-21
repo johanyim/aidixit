@@ -1,11 +1,58 @@
+@font-face {
+    font-family: 'Dilana';
+    src:url('fonts/Dilana.ttf.woff') format('woff'),
+        url('fonts/Dilana.ttf.svg#Dilana') format('svg'),
+        url('fonts/Dilana.ttf.eot'),
+        url('fonts/Dilana.ttf.eot?#iefix') format('embedded-opentype'); 
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Lazy-Dog';
+    src:url('fonts/Lazy-Dog.ttf.woff') format('woff'),
+        url('fonts/Lazy-Dog.ttf.svg#Lazy-Dog') format('svg'),
+        url('fonts/Lazy-Dog.ttf.eot'),
+        url('fonts/Lazy-Dog.ttf.eot?#iefix') format('embedded-opentype'); 
+    font-weight: normal;
+    font-style: normal;
+}
 
 /* || general  */
 * {
     margin:0;padding:0;
     box-sizing: border-box;
 }
-*:focus {
-    outline:none;
+*:focus { outline:none; }
+a {text-decoration: none;}
+
+/* || windows */
+.max-space {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    align-self: center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    display: flex;
+}
+
+.min-space {
+    align-items: center;
+    align-self: center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    display: flex;
+}
+
+.window {
+    background: white;
+    border: 5px solid black;
+    border-radius: 2vh;
+    display: flex;
+    padding: 3rem;
 }
 
 /* || page navigation */
@@ -14,17 +61,15 @@
     width: 100vw;
     position: fixed;
     z-index: 0;
-    display: none;
     visibility: hidden;
+    display: flex;
 }
 
 .page:target {
-    display: block;
     visibility: visible;
 }
 
 .page:not(:target) {
-    display: none;
     visibility: hidden;
     height: 0; width:0;
 }
@@ -38,21 +83,22 @@
     justify-content: space-around;
     display: flex;
 }
-.form-container {
-    height: 50vh;
-    width: 60vw;
-    flex-direction: column;
-    align-items: center
+
+#landing-container {
+    background: #ef7718;
+
 }
 
-.window {
-    background: white;
-    border: 5px solid black;
-    border-radius: 2vh;
-
-    display:flex;
-}
 h1 {
+    font-weight: 100;
+    font-size: 10em;
+    font-family: Dilana;
+    color: #423b45;
+    text-shadow:
+    4px 4px 0 #f6dca9,
+    -4px 4px 0 #f6dca9,
+    -4px -4px 0 #f6dca9,
+    4px -4px 0 #f6dca9;
     flex: 0;
     display: flex;
     align-items: center;
@@ -69,7 +115,8 @@ h1 {
 
 
 #username {
-    font-size: 2rem;
+    font-family: 'Lazy-Dog', cursive;
+    font-size: 4rem;
     padding: 4rem 0 ;
     flex: 0 0 10vh;
     border: none;
@@ -78,7 +125,8 @@ h1 {
 }
 
 #username-form button {
-    font-size: 2rem;
+    font-family: 'Lazy-Dog', cursive;
+    font-size: 3rem;
     flex: 1;
     border: 5px solid black;
     margin: 0;
@@ -90,23 +138,45 @@ h1 {
 }
 
 
+/* || lobby-actions */
 
-/* || lobby */
-
-#lobby-selection {
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
+#lobby-actions {
     display: flex;
-    padding: 3rem;
+    flex-direction: row;
+    align-items: center;
+    padding: 4rem;
+    gap: 2rem;
+    flex-wrap: wrap;
 }
 
-.lobby-container {
+#create-lobby,
+#join-lobby {
+    font-family: 'Lazy-Dog', cursive;
+    height: 40vh;
+    flex: 1 0 20rem;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+
+    font-size: 5rem;
+    color: black
+}
+
+
+/* || open lobby */
+
+#open-lobby {
+    padding: 4rem;
     height: 100%;
     width: 100%;
     flex-direction: column;
-    align-items: center
+    align-items: center;
+    justify-content: space-around;
 }
+
+
+/* lobby selection */
 
 
 
@@ -173,7 +243,6 @@ li.chat {
 /* || Cards being played  */
 
 .playing-area {
-    /* border: 10px solid red; */
     width: 100%;
     height: 100vh; 
     overflow: scroll;

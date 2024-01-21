@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIDixit</title>
+  <title>AI Dixit</title>
   <link href="style.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.3/socket.io.min.js" integrity="sha512-uxgT9qpJ2dYbAdKgbmD+b9e5rEta2gULQno8q0mm8t7CNLUwIOm7V3ALywTg6dAIbw9JxGi6aa3RCRLRdSW15Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="./app.js" defer></script>
@@ -12,19 +12,45 @@
 <body onload='location.href="#landing"'>
 
     <div id="landing" class="page">
-        <div class="window form-container">
-            <h1>AI Dixit</h1>
-            <form id="username-form" action="#lobby-selection">
+        <div id="landing-container" class="window min-space">
+            <h1>AI DiXit</h1>
+            <form id="username-form" action="#lobby-actions">
                 <input type="text" id="username" placeholder="Your name">
                 <button type="submit">Go</button>
             </form>
         </div>
     </div>
 
-    <div id="lobby-selection" class="page">
-        <div class="window lobby-container">
+    <!-- create or join lobby -->
+    <div id="lobby-actions" class="page">
+        <a id="create-lobby" class="window" href="#open-lobby">Create a lobby</a>
+        <a id="join-lobby" class="window" href="#lobby-selection">Join a lobby</a>
+    </div>
 
-            <h1>AI Dixit</h1>
+    <!-- open lobby upon creation -->
+    <div id="open-lobby" class="page">
+        <div class="window max-space">
+            <h2>Lobby name: </h2>
+            <h3>Players:</h3>
+            <ul>
+                <li>Johan</li>
+                <li>Jason</li>
+                <li>Kitty</li>
+                
+            </ul>
+            <a href="#game">Start game</a>
+        </div>
+    </div>
+
+    <!-- <div id="landing" class="page"> -->
+    <!--     <div class="window"> -->
+    <!--         <a href="#landing">landing</a> -->
+    <!--     </div> -->
+    <!-- </div> -->
+
+    <div id="lobby-selection" class="page">
+        <div class="window max-space">
+            <h1>AI DiXit</h1>
             <a href="#game"><h2>go to game</h2></a>
         </div>
     </div>
