@@ -41,129 +41,143 @@ const expressServer = app.listen(PORT, () => {
 const io = initializeSocket(expressServer)
 
 const socketToRoomMap = {};
+const socketToNameMap = {};
 
 // send images buffer
 io.on('connection', (socket) => {
-    socketToRoomMap[socket.id] = socket.id;
-    joinRoom(socket, 'lobby')
+    initializeConnection(socket);
+    handleIO(socket, createInfoMessage(socket));
+    handleIO(socket, handleNewPlayerEnter(socket));
+    socket.on('setName', (name) => handleSetName(socket, name));
 
-    //  broadcasts a grey info message
-    const infoMessage = {
-        to: 'all',
-        message: 'infoMessage',
-        args: `${socket.id.substring(0, 5)} has entered`,
-    }
-    handleIO(socket, infoMessage)
+    // ------------------------- GAME RELATED ------------------------------
 
-    const res = handleNewPlayerEnter(socket)
-    handleIO(socket, res)
-
-    // start Game, 
-    socket.on('startGame', () => {
-        const res = handleGameStart(socket)
-        handleIO(socket, res)
-
-    });
-
-    // storyteller card chosen
-    socket.on('gameMasterSubmitCard', ({ prompt, cardId }) => {
-        const res = handleGameMasterSubmitCard(socket, { prompt, cardId })
-        handleIO(socket, res)
-
-    });
-
-    // guesser card chosen
-    // cardInfo = { 'id': string, 'URL': string }
-    socket.on('otherSubmitCard', (cardId) => {
-        console.log(cardId)
-        const res = handleSubmitCard(socket, cardId)
-        handleIO(socket, res)
-    });
-
-    socket.on('vote', (cardId) => {
-        // Handle a player voting
-        // Emit 'updateGameState' to broadcast the updated game state
-        const res = handleVoting(socket, cardId)
-        handleIO(socket, res)
-    });
-
-    socket.on('scoring', () => {
-        const res = handleScoring()
-        handleIO(socket, res)
-    });
-
-    // Chat events
-    // Handle sending a chat message
-    socket.on('sendMessage', (messageInfo) => {
-        const res = {
-            to: 'all',
-            message: 'broadcastMessage',
-            args: `${socket.id.substring(0, 5)}: ${messageInfo}`,
-        }
-        handleIO(socket, res)
-    });
-
-    socket.on('setName', (name) => {
-        const res = handleNameSet(socket, name)
-        handleIO(socket, res)
-
-    });
+    socket.on('startGame', () => handleGameEvent(socket, 'gameStart'));
+    socket.on('gameMasterSubmitCard', ({ prompt, cardId }) => handleGameEvent(socket, 'gameMasterSubmitCard', { prompt, cardId }));
+    socket.on('otherSubmitCard', cardId => handleGameEvent(socket, 'submitCard', cardId));
+    socket.on('vote', cardId => handleGameEvent(socket, 'vote', cardId));
+    socket.on('scoring', () => handleGameEvent(socket, 'scoring'));
 
     // ------------------------- ROOMS RELATED ------------------------------
 
-    socket.on('createRoom', (room, cb) => {
-        joinRoom(socket, room)
-        cb(`Created and Joined ${room}`)
-    });
+    socket.on('createRoom', (room, cb) => handleCreateRoom(socket, room, cb));
+    socket.on('joinRoom', (room, cb) => handleJoinRoom(socket, room, cb));
+    socket.on('getRooms', (cb) => handleGetRooms(cb));
+    socket.on('leaveRoom', (cb) => handleLeaveRoom(socket, cb));
 
+    // ------------------------- Chat RELATED ------------------------------
+    // Handle sending a chat message
+    socket.on('sendMessage', (messageInfo) => handleChatMessage(socket, messageInfo));
 
-    socket.on('joinRoom', (room, cb) => {
-        joinRoom(socket, room)
-        cb(`Joined ${room}`)
-    });
-
-    socket.on('getRooms', (cb) => {
-        const roomsInfo = []
-        const allRooms = io.sockets.adapter.rooms;
-        console.log('allRooms :>> ', allRooms);
-
-        for (const [roomName, socketIds] of allRooms.entries()) {
-            // Get the size of the Set to determine the number of sockets in the room
-            const length = socketIds.size;
-        
-            if (length > 0) {
-                roomsInfo.push({
-                    name: roomName,
-                    length: length
-                });
-            }
-        }
-        cb(roomsInfo)
-    });
-
-    socket.on('leaveRoom', () => {
-        leaveRoom(socket)
-        cb(`Left ${room}`)
-    });
 })
 
-function joinRoom(socket, room, leaveCurrent=true) {
+function initializeConnection(socket) {
+    socketToRoomMap[socket.id] = socket.id;
+    joinRoom(socket, 'lobby');
+}
+
+function handleSetName(socket, name){
+    // socketToNameMap[socket.id] = name
+    const res = handleNameSet(socket, name)
+    handleIO(socket, res)
+}
+
+function createInfoMessage(socket) {
+    return {
+        to: 'all',
+        message: 'infoMessage',
+        args: `${socket.id.substring(0, 5)} has entered`,
+    };
+}
+
+function handleChatMessage(socket, messageInfo) {
+    handleIO(socket, {
+        to: 'all',
+        message: 'broadcastMessage',
+        args: `${socket.id.substring(0, 5)}: ${messageInfo}`,
+    });
+}
+
+
+function joinRoom(socket, room, leaveCurrent = true) {
     // Exit current room first
-    if(leaveCurrent) leaveRoom(socket)
+    if (leaveCurrent) leaveRoom(socket)
     socket.join(room)
     socketToRoomMap[socket.id] = room;
 }
 
-function leaveRoom(socket){
+function leaveRoom(socket) {
     const roomName = socketToRoomMap[socket.id];
     if (roomName) {
         socket.leave(roomName);
         delete socketToRoomMap[socket.id];
-    } 
+    }
 
     // BUG: causes recursive call with joinRoom
     // Back to lobby
     joinRoom(socket, 'lobby', false)
+}
+
+function handleGetRooms(cb) {
+    const roomsInfo = []
+    const allRooms = io.sockets.adapter.rooms;
+    console.log('allRooms :>> ', allRooms);
+
+    for (const [roomName, socketIds] of allRooms.entries()) {
+        // Get the size of the Set to determine the number of sockets in the room
+        const length = socketIds.size;
+
+        if (length > 0) {
+            roomsInfo.push({
+                name: roomName,
+                length: length
+            });
+        }
+    }
+    cb(roomsInfo)
+}
+
+function handleCreateRoom(socket, room, cb) {
+    joinRoom(socket, room)
+    cb(`Created and Joined ${room}`)
+}
+
+function handleJoinRoom(socket, room, cb) {
+    joinRoom(socket, room)
+    cb(`Joined ${room}`)
+}
+
+function handleLeaveRoom(socket, cb) {
+    leaveRoom(socket);
+    cb(`Left room`);
+}
+
+function handleGameEvent(socket, eventName, data = null) {
+    let res;
+
+    switch (eventName) {
+        case 'gameStart':
+            res = handleGameStart(socket);
+            break;
+        case 'gameMasterSubmitCard':
+            res = handleGameMasterSubmitCard(socket, data);
+            break;
+        case 'submitCard':
+            console.log(data);
+            res = handleSubmitCard(socket, data);
+            break;
+        case 'vote':
+            res = handleVoting(socket, data);
+            break;
+        case 'scoring':
+            res = handleScoring();
+            break;
+        default:
+            // Handle unknown event
+            break;
+    }
+
+    handleIO(socket, res);
 }
 
 // to = 'all' | 'sender'
@@ -171,10 +185,10 @@ function handleIO(socket, res) {
     // No response received 
     if (res === null || res == undefined) return
 
-    const room = socketToRoomMap[socket.id];
     const { to, message, args } = res
 
     if (to === 'all') {
+        const room = socketToRoomMap[socket.id];
         if (room === undefined || room === null) {
             io.emit(message, args)
         } else {
@@ -184,4 +198,3 @@ function handleIO(socket, res) {
         socket.emit(message, args)
     }
 }
-
