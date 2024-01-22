@@ -10,71 +10,79 @@
 </head>
 
 <body onload='location.href="#landing"'>
-
-    <div id="landing" class="page">
-        <div id="landing-container" class="window min-space">
-            <h1>AI DiXit</h1>
-            <form id="username-form" action="#lobby-actions">
-                <input type="text" id="username" placeholder="Your name">
-                <button type="submit">Go</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- create or join lobby -->
-    <div id="lobby-actions" class="page">
-        <a id="create-lobby" class="window" href="#open-lobby">Create a lobby</a>
-        <a id="join-lobby" class="window" href="#lobby-selection">Join a lobby</a>
-    </div>
-
-    <!-- open lobby upon creation -->
-    <div id="open-lobby" class="page">
-        <div class="window max-space">
-            <h2>Lobby name: </h2>
-            <h3>Players:</h3>
-            <ul>
-                <li>Johan</li>
-                <li>Jason</li>
-                <li>Kitty</li>
-                
-            </ul>
-            <a href="#game">Start game</a>
-        </div>
-    </div>
-
-    <!-- <div id="landing" class="page"> -->
-    <!--     <div class="window"> -->
-    <!--         <a href="#landing">landing</a> -->
-    <!--     </div> -->
-    <!-- </div> -->
-
-    <div id="lobby-selection" class="page">
-        <div class="window max-space">
-            <h1>AI DiXit</h1>
-            <a href="#game"><h2>go to game</h2></a>
-        </div>
-    </div>
-
-    <div id="game" class="page">
-        <div class="info-area">
-            <p class="room-name">Room name:</p>
-        </div>
-        <div class="playing-area">
-            <ul id="played" class="cards"></ul>
-        </div>
-
-        <div class="user-area">
-            <ul id="hand" class="cards"></ul>
-            <div id="chat-container">
-                <ul class="messages" id="chat-messages"></ul>
-                <form id="message-form">
-                    <input type="text" placeholder="Your message" id="message-input">
-                    <button type="submit" id="send-button">Send</button>
+    <div id="page-container">
+        <div id="landing" class="page">
+            <div id="landing-container" class="window min-space">
+                <h1>AI DiXit</h1>
+                <form id="username-form" action="#lobby-actions">
+                    <input type="text" id="username" placeholder="Your name">
+                    <button type="submit">Go</button>
                 </form>
             </div>
+        </div>
 
-            <!-- <button type="submit" id="backendTest-button" onclick=backendTest()>backendTest</button>  -->
+        <!-- create or join lobby -->
+        <div id="lobby-actions" class="page">
+            <a id="create-lobby" class="window" href="#open-lobby">Create a lobby</a>
+            <a id="join-lobby" class="window" href="#lobby-selection">Join a lobby</a>
+        </div>
+
+        <!-- open lobby upon creation -->
+        <div id="open-lobby" class="page">
+            <div class="window max-space">
+                <h2>Lobby name: </h2>
+                <h3>Players:</h3>
+                <ul>
+                    <li>Johan</li>
+                    <li>Jason</li>
+                    <li>Kitty</li>
+                </ul>
+                <a href="#game">Start game</a>
+            </div>
+            <!-- <div id="chat-container"> -->
+            <!--     <ul class="messages" id="chat-messages"></ul> -->
+            <!--     <form id="message-form"> -->
+            <!--         <input type="text" placeholder="Your message" id="message-input"> -->
+            <!--         <button type="submit" id="send-button">Send</button> -->
+            <!--     </form> -->
+            <!-- </div> -->
+        </div>
+
+        <!-- <div id="landing" class="page"> -->
+        <!--     <div class="window"> -->
+        <!--         <a href="#landing">landing</a> -->
+        <!--     </div> -->
+        <!-- </div> -->
+
+        <div id="lobby-selection" class="page">
+            <div class="window max-space">
+                <h1>AI DiXit</h1>
+                <a href="#game"><h2>go to game</h2></a>
+            </div>
+        </div>
+
+        <div id="game" class="page">
+            <div class="info-area">
+                <p class="room-name">Room name:</p>
+            </div>
+            <div class="playing-area">
+                <ul id="played" class="cards"></ul>
+            </div>
+
+            <div class="user-area">
+                <ul id="hand" class="cards"></ul>
+
+                <!-- <button type="submit" id="backendTest-button" onclick=backendTest()>backendTest</button>  -->
+            </div>
         </div>
     </div>
+    <details id="chat-container">
+        <summary>open chat</summary>
+        <ul class="messages" id="chat-messages"></ul>
+        <form id="message-form">
+            <input type="text" placeholder="Your message" id="message-input">
+            <button type="submit" id="send-button">Send</button>
+        </form>
+    </details>
 </body>
 </html>
