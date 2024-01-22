@@ -78,6 +78,7 @@ function initializeConnection(socket) {
 
 function handleSetName(socket, name) {
     socketToNameMap[socket.id] = name
+    //This line Will be remove later
     const res = handleNameSet(socket, name)
     handleIO(socket, res)
 }
@@ -110,14 +111,9 @@ function joinRoom(socket, room) {
 
 function leaveRoom(socket, backToLobby=true) {
     const roomName = socketToRoomMap[socket.id];
-    console.log('leaving :>> ', roomName);
     if (roomName) {
-        console.log('actually leaving :>> ', roomName);
-
         socket.leave(roomName);
         delete socketToRoomMap[socket.id];
-        console.log('socketToRoomMap :>> ', socketToRoomMap);
-
     }
 
     // // BUG: causes recursive call with joinRoom
@@ -151,7 +147,8 @@ function handleGetRooms(cb) {
 
         if (length > 0) {
             roomsInfo.push({
-                name: roomName,
+                roomName: roomName,
+                playerNames:[...socketIds].map(socketId =>socketToNameMap[socketId]),
                 length: length
             });
         }
