@@ -77,7 +77,7 @@ function initializeConnection(socket) {
 }
 
 function handleSetName(socket, name) {
-    // socketToNameMap[socket.id] = name
+    socketToNameMap[socket.id] = name
     const res = handleNameSet(socket, name)
     handleIO(socket, res)
 }
@@ -99,23 +99,30 @@ function handleChatMessage(socket, messageInfo) {
 }
 
 
-function joinRoom(socket, room, leaveCurrent = true) {
+function joinRoom(socket, room) {
     // Exit current room first
-    if (leaveCurrent) leaveRoom(socket)
+    if (socketToRoomMap[socket.id]) {
+        leaveRoom(socket, false)
+    }
     socket.join(room)
     socketToRoomMap[socket.id] = room;
 }
 
-function leaveRoom(socket) {
+function leaveRoom(socket, backToLobby=true) {
     const roomName = socketToRoomMap[socket.id];
+    console.log('leaving :>> ', roomName);
     if (roomName) {
+        console.log('actually leaving :>> ', roomName);
+
         socket.leave(roomName);
         delete socketToRoomMap[socket.id];
+        console.log('socketToRoomMap :>> ', socketToRoomMap);
+
     }
 
-    // BUG: causes recursive call with joinRoom
-    // Back to lobby
-    joinRoom(socket, 'lobby', false)
+    // // BUG: causes recursive call with joinRoom
+    // // Back to lobby
+    if(backToLobby) joinRoom(socket, 'lobby', false)
 }
 
 function handleCreateRoom(socket, room, cb) {
