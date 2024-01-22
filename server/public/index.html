@@ -29,7 +29,7 @@
 
         <!-- open lobby upon creation -->
         <div id="open-lobby" class="page">
-            <div class="window max-space">
+            <div id="lobby-window" class="window max-space">
                 <h2>Lobby name: </h2>
                 <h3>Players:</h3>
                 <ul>
@@ -76,13 +76,16 @@
             </div>
         </div>
     </div>
-    <details id="chat-container">
-        <summary>open chat</summary>
-        <ul class="messages" id="chat-messages"></ul>
-        <form id="message-form">
-            <input type="text" placeholder="Your message" id="message-input">
-            <button type="submit" id="send-button">Send</button>
-        </form>
+    <details id="chat-popup">
+        <summary></summary>
+        <div id="chat-container" class="window">
+            <ul class="messages" id="chat-messages"></ul>
+            <form id="message-form">
+                <input type="text" placeholder="Your message" id="message-input">
+                <button type="submit" id="send-button">Send</button>
+            </form>
+            
+        </div>
     </details>
 </body>
 </html>
