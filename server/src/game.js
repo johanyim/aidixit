@@ -18,7 +18,6 @@ export const defaultPlayer = {
     score: 0,
     submittedCard: false,
     hasVoted: false,
-    score: 0,
 };
 
 // interface CardInfo {
@@ -89,14 +88,8 @@ export function handleNewPlayerEnter(socket) {
     gameState.players.push(newPlayer);
 
     //Setup initial card deck
-    const cardDeck = []
-
-    for (let i = 0; i < initialCardNumber; i++) {
-        const cardId = generateCard(newPlayer)
-        const cardInfo = { 'id': cardId, 'url': cards[cardId].imageUrl }
-        cardDeck.push(cardInfo)
-    }
-
+    const cardDeck = prepareCards(newPlayer)
+    
     return { to: 'sender', message: 'initialCards', args: cardDeck }
 
 }
@@ -236,6 +229,18 @@ export function handleScoring(){
 
 let isTesting = false
 let count = 1
+
+function prepareCards(newPlayer){
+    const cardDeck = []
+
+    for (let i = 0; i < initialCardNumber; i++) {
+        const cardId = generateCard(newPlayer)
+        const cardInfo = { 'id': cardId, 'url': cards[cardId].imageUrl }
+        cardDeck.push(cardInfo)
+    }
+
+    return cardDeck
+}
 
 function generateCard(playerId) {
     let cardId, imageUrl;
