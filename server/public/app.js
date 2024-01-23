@@ -12,6 +12,7 @@ const messageInput = document.getElementById('message-input');
 // app.get("/index", (req, res) => {
 //   res.send("Welcome home");
 // });
+//
 
 socket.on('initialCards', (cards) => {
     // Check if imageurls is an array
